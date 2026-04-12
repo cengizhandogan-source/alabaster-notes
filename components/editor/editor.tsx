@@ -2,12 +2,13 @@
 
 import { useState, useCallback, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { Note } from "@/lib/types"
+import { Note, Tag } from "@/lib/types"
 import { updateNote, deleteNote } from "@/actions/notes"
+import { uploadAndGetMarkdown } from "@/lib/upload"
 import { useAutoSave } from "@/hooks/use-auto-save"
 import { EditorToolbar } from "./editor-toolbar"
+import { NoteTags } from "./note-tags"
 import { MarkdownEditor } from "./markdown-editor"
-import { MarkdownPreview } from "./markdown-preview"
 import type { NoteRef } from "@/lib/cengo-scrip/utils/slugify"
 
 interface EditorProps {
@@ -16,14 +17,15 @@ interface EditorProps {
   onToggleSidebar?: () => void
   isSidebarCollapsed?: boolean
   onExpandSidebar?: () => void
+  allTags?: Tag[]
+  noteTagIds?: string[]
 }
 
-export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExpandSidebar }: EditorProps) {
+export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExpandSidebar, allTags = [], noteTagIds = [] }: EditorProps) {
   const router = useRouter()
   const onNavigateNote = useCallback((id: string) => router.push(`/notes/${id}`), [router])
   const [title, setTitle] = useState(note.title)
   const [content, setContent] = useState(note.content)
-  const [showPreview, setShowPreview] = useState(false)
 
   const titleRef = useRef(title)
   const contentRef = useRef(content)
@@ -34,7 +36,6 @@ export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExp
   useEffect(() => {
     setTitle(note.title)
     setContent(note.content)
-    setShowPreview(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [note.id])
 
@@ -75,6 +76,24 @@ export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExp
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const handleUploadFile = () => {
+    const input = document.createElement("input")
+    input.type = "file"
+    input.accept = "image/*,.pdf,.csv,.doc,.docx,.xls,.xlsx,.txt,.zip"
+    input.onchange = async () => {
+      const file = input.files?.[0]
+      if (!file) return
+      try {
+        const markdown = await uploadAndGetMarkdown(file)
+        const separator = contentRef.current.length > 0 ? "\n\n" : ""
+        handleContentChange(contentRef.current + separator + markdown)
+      } catch {
+        // Upload failed silently — drag-drop/paste have inline error handling
+      }
+    }
+    input.click()
+  }
+
   const handleDelete = async () => {
     if (confirm("delete this note?")) {
       await deleteNote(note.id)
@@ -88,17 +107,13 @@ export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExp
         onTitleChange={handleTitleChange}
         status={status}
         onDelete={handleDelete}
-        onTogglePreview={() => setShowPreview(!showPreview)}
-        showPreview={showPreview}
+        onUploadFile={handleUploadFile}
         onToggleSidebar={onToggleSidebar}
         isSidebarCollapsed={isSidebarCollapsed}
         onExpandSidebar={onExpandSidebar}
       />
-      {showPreview ? (
-        <MarkdownPreview content={content} notes={notes} />
-      ) : (
-        <MarkdownEditor content={content} onChange={handleContentChange} notes={notes} onNavigateNote={onNavigateNote} />
-      )}
+      <NoteTags noteId={note.id} assignedTagIds={noteTagIds} allTags={allTags} />
+      <MarkdownEditor content={content} onChange={handleContentChange} notes={notes} onNavigateNote={onNavigateNote} />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Folder, Note } from "@/lib/types"
+import { Folder, Note, Tag, NoteTag } from "@/lib/types"
 import { NoteListItem } from "./note-list-item"
 import { renameFolder, deleteFolder } from "@/actions/folders"
 import { createNote } from "@/actions/notes"
@@ -12,9 +12,11 @@ interface FolderItemProps {
   allFolders: Folder[]
   activeNoteId?: string
   onNoteClick?: () => void
+  tags?: Tag[]
+  noteTags?: NoteTag[]
 }
 
-export function FolderItem({ folder, notes, allFolders, activeNoteId, onNoteClick }: FolderItemProps) {
+export function FolderItem({ folder, notes, allFolders, activeNoteId, onNoteClick, tags = [], noteTags = [] }: FolderItemProps) {
   const [isExpanded, setIsExpanded] = useState(() => {
     if (typeof window === "undefined") return true
     const stored = localStorage.getItem(`folder-expanded-${folder.id}`)
@@ -145,6 +147,7 @@ export function FolderItem({ folder, notes, allFolders, activeNoteId, onNoteClic
               isActive={note.id === activeNoteId}
               onClick={onNoteClick}
               folders={allFolders}
+              tags={noteTags.filter((nt) => nt.note_id === note.id).map((nt) => tags.find((t) => t.id === nt.tag_id)).filter(Boolean) as Tag[]}
             />
           ))}
         </div>

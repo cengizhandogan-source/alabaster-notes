@@ -28,12 +28,6 @@ export default async function Home() {
           >
             &gt; log in
           </Link>
-          <Link
-            href="/signup"
-            className="text-sm text-secondary hover:text-foreground transition-colors duration-100 inline-block"
-          >
-            &gt; sign up
-          </Link>
         </div>
       </div>
     </div>

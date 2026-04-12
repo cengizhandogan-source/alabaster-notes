@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
-import { Note, Folder } from "@/lib/types"
+import { Note, Folder, Tag } from "@/lib/types"
 import { moveNoteToFolder } from "@/actions/notes"
 
 function timeAgo(dateStr: string): string {
@@ -21,11 +21,13 @@ export function NoteListItem({
   isActive,
   onClick,
   folders,
+  tags,
 }: {
   note: Note
   isActive: boolean
   onClick?: () => void
   folders?: Folder[]
+  tags?: Tag[]
 }) {
   const [showMenu, setShowMenu] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -67,6 +69,19 @@ export function NoteListItem({
             {timeAgo(note.updated_at)}
           </span>
         </div>
+        {tags && tags.length > 0 && (
+          <div className="flex gap-1 mt-1 flex-wrap max-h-[36px] overflow-hidden">
+            {tags.map((tag) => (
+              <span
+                key={tag.id}
+                className="text-[10px] px-1.5 py-0.5 rounded-sm"
+                style={{ backgroundColor: tag.color + "20", color: tag.color }}
+              >
+                {tag.name}
+              </span>
+            ))}
+          </div>
+        )}
       </Link>
 
       {folders && folders.length > 0 && (

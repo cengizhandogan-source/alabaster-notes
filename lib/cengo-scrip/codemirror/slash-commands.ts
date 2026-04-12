@@ -1,4 +1,5 @@
 import { EditorView } from "@codemirror/view"
+import { uploadAndGetMarkdown } from "@/lib/upload"
 
 type SlashCommand = {
   pattern: string
@@ -84,6 +85,56 @@ const commands: SlashCommand[] = [
         changes: { from: matchStart, to: matchEnd, insert: "```\n\n```" },
         selection: { anchor: matchStart + 4 },
       })
+    },
+  },
+  {
+    pattern: "/todo",
+    handle(view, matchStart, matchEnd) {
+      view.dispatch({
+        changes: { from: matchStart, to: matchEnd, insert: "- [ ] " },
+        selection: { anchor: matchStart + 6 },
+      })
+    },
+  },
+  {
+    pattern: "/file",
+    handle(view, matchStart, matchEnd) {
+      view.dispatch({
+        changes: { from: matchStart, to: matchEnd, insert: "" },
+      })
+
+      const input = document.createElement("input")
+      input.type = "file"
+      input.accept = "image/*,.pdf,.csv,.doc,.docx,.xls,.xlsx,.txt,.zip"
+      input.onchange = () => {
+        const file = input.files?.[0]
+        if (!file) return
+
+        const pos = view.state.selection.main.head
+        const placeholderId = crypto.randomUUID().slice(0, 8)
+        const placeholder = `![Uploading ${placeholderId}...]()`
+
+        view.dispatch({ changes: { from: pos, insert: placeholder } })
+
+        uploadAndGetMarkdown(file)
+          .then((markdown) => {
+            const doc = view.state.doc.toString()
+            const idx = doc.indexOf(placeholder)
+            if (idx === -1) return
+            view.dispatch({
+              changes: { from: idx, to: idx + placeholder.length, insert: markdown },
+            })
+          })
+          .catch(() => {
+            const doc = view.state.doc.toString()
+            const idx = doc.indexOf(placeholder)
+            if (idx === -1) return
+            view.dispatch({
+              changes: { from: idx, to: idx + placeholder.length, insert: `[Upload failed: ${file.name}]` },
+            })
+          })
+      }
+      input.click()
     },
   },
 ]

@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import { Note, Folder } from "@/lib/types"
+import { Note, Folder, Tag, NoteTag } from "@/lib/types"
 import { NoteListItem } from "./note-list-item"
 import { FolderItem } from "./folder-item"
 
@@ -11,9 +11,18 @@ interface NoteListProps {
   allFolders: Folder[]
   activeNoteId?: string
   onNoteClick?: () => void
+  tags?: Tag[]
+  noteTags?: NoteTag[]
 }
 
-export function NoteList({ notes, folders, allFolders, activeNoteId, onNoteClick }: NoteListProps) {
+function resolveNoteTags(noteId: string, tags: Tag[], noteTags: NoteTag[]): Tag[] {
+  return noteTags
+    .filter((nt) => nt.note_id === noteId)
+    .map((nt) => tags.find((t) => t.id === nt.tag_id))
+    .filter(Boolean) as Tag[]
+}
+
+export function NoteList({ notes, folders, allFolders, activeNoteId, onNoteClick, tags = [], noteTags = [] }: NoteListProps) {
   const { folderNotes, unfiledNotes } = useMemo(() => {
     const folderNotes = new Map<string, Note[]>()
     const unfiledNotes: Note[] = []
@@ -49,6 +58,8 @@ export function NoteList({ notes, folders, allFolders, activeNoteId, onNoteClick
           allFolders={allFolders}
           activeNoteId={activeNoteId}
           onNoteClick={onNoteClick}
+          tags={tags}
+          noteTags={noteTags}
         />
       ))}
       {unfiledNotes.map((note) => (
@@ -58,6 +69,7 @@ export function NoteList({ notes, folders, allFolders, activeNoteId, onNoteClick
           isActive={note.id === activeNoteId}
           onClick={onNoteClick}
           folders={allFolders}
+          tags={resolveNoteTags(note.id, tags, noteTags)}
         />
       ))}
     </div>

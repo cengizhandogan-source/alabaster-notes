@@ -175,6 +175,20 @@ body {
 
 .markdown-body input[type="checkbox"] {
   margin-right: 0.5em;
+  accent-color: var(--accent);
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.markdown-body ul.contains-task-list {
+  list-style: none;
+  padding-left: 0.5em;
+}
+
+.markdown-body li:has(> input:checked) {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--border);
 }
 
 /* cengo-scrip: AI block styles */

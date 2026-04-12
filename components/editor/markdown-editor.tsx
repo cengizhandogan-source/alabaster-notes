@@ -84,7 +84,10 @@ export function MarkdownEditor({ content, onChange, notes, onNavigateNote }: Mar
         markdownHighlight,
         cengoScripExtension({ notes, onNavigate: onNavigateNote }),
         placeholder("> start writing..."),
-        keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap]),
+        keymap.of([
+          { key: "Tab", run: (view) => { view.dispatch(view.state.replaceSelection("  ")); return true } },
+          ...defaultKeymap, ...historyKeymap, ...searchKeymap,
+        ]),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             onChange(update.state.doc.toString())

@@ -5,8 +5,7 @@ interface EditorToolbarProps {
   onTitleChange: (title: string) => void
   status: "idle" | "saving" | "saved" | "error"
   onDelete: () => void
-  onTogglePreview: () => void
-  showPreview: boolean
+  onUploadFile?: () => void
   onToggleSidebar?: () => void
   isSidebarCollapsed?: boolean
   onExpandSidebar?: () => void
@@ -17,8 +16,7 @@ export function EditorToolbar({
   onTitleChange,
   status,
   onDelete,
-  onTogglePreview,
-  showPreview,
+  onUploadFile,
   onToggleSidebar,
   isSidebarCollapsed,
   onExpandSidebar,
@@ -74,17 +72,16 @@ export function EditorToolbar({
         {statusText[status]}
       </span>
 
-      {/* Preview toggle */}
-      <button
-        onClick={onTogglePreview}
-        className={`text-xs px-2 py-1 border border-border transition-colors duration-100 ${
-          showPreview
-            ? "bg-surface text-accent"
-            : "text-secondary hover:text-foreground"
-        }`}
-      >
-        {showPreview ? "> edit" : "> preview"}
-      </button>
+      {/* Attach file */}
+      {onUploadFile && (
+        <button
+          onClick={onUploadFile}
+          className="text-xs text-secondary hover:text-foreground transition-colors duration-100"
+          title="Attach file"
+        >
+          attach
+        </button>
+      )}
 
       {/* Delete */}
       <button

@@ -138,6 +138,14 @@ export const cengoScripTheme = EditorView.baseTheme({
     borderLeftColor: "var(--error)",
   },
 
+  // Checkbox widget
+  ".cm-checkbox-widget": {
+    cursor: "pointer",
+    accentColor: "var(--accent)",
+    marginRight: "4px",
+    verticalAlign: "middle",
+  },
+
   // Note link
   ".cm-cengo-note-link": {
     color: "var(--accent)",
@@ -155,5 +163,18 @@ export const cengoScripTheme = EditorView.baseTheme({
     color: "var(--muted)",
     textDecoration: "underline dashed",
     textUnderlineOffset: "2px",
+  },
+
+  // Image widget
+  ".cm-image-widget-wrapper": {
+    padding: "4px 0",
+  },
+  ".cm-image-widget": {
+    display: "block",
+    maxWidth: "100%",
+    maxHeight: "400px",
+    objectFit: "contain",
+    borderRadius: "4px",
+    border: "1px solid var(--border)",
   },
 })
