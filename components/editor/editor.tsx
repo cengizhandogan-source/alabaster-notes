@@ -101,7 +101,7 @@ export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExp
   }
 
   return (
-    <div className="flex-1 flex flex-col h-screen bg-background">
+    <div className="flex-1 flex flex-col h-full bg-background">
       <EditorToolbar
         title={title}
         onTitleChange={handleTitleChange}

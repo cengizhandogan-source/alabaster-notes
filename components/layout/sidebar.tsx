@@ -63,7 +63,7 @@ export function Sidebar({ notes, folders, tags, noteTags, activeNoteId, isOpen, 
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className={`hidden lg:flex flex-col border-r border-border bg-background h-screen transition-all duration-200 ${isCollapsed ? "w-0 border-r-0 overflow-hidden" : "w-[280px]"}`}>
+      <aside className={`hidden lg:flex flex-col border-r border-border bg-background h-full transition-all duration-200 ${isCollapsed ? "w-0 border-r-0 overflow-hidden" : "w-[280px]"}`}>
         <SidebarHeader onToggleCollapse={onToggleCollapse} search={search} onSearchChange={setSearch} tags={tags} />
         <TagFilter tags={tags} selectedTagIds={selectedTagIds} onToggleTag={handleToggleTag} />
         <NoteList notes={filteredNotes} folders={filteredFolders} allFolders={folders} activeNoteId={activeNoteId} tags={tags} noteTags={noteTags} />

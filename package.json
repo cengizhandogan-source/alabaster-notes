@@ -1,12 +1,48 @@
 {
   "name": "alabaster-notes",
   "version": "0.1.0",
+  "description": "A minimal, distraction-free note-taking app with markdown editing, AI assistance, and a clean alabaster aesthetic",
+  "author": "Cengizhan Dogan",
   "private": true,
+  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "electron:dev": "tsc -p electron/tsconfig.json && concurrently --kill-others \"next dev --port 3456\" \"wait-on http://localhost:3456 && DEV_PORT=3456 electron .\"",
+    "electron:build": "next build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/ && tsc -p electron/tsconfig.json && electron-builder",
+    "electron:compile": "tsc -p electron/tsconfig.json"
+  },
+  "build": {
+    "appId": "com.alabaster.notes",
+    "productName": "Alabaster Notes",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist-electron/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": ".next/standalone",
+        "to": "standalone",
+        "filter": ["**/*"]
+      }
+    ],
+    "afterPack": "./scripts/afterPack.js",
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.productivity",
+      "icon": "resources/icon.icns"
+    }
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.3",
@@ -33,9 +69,14 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
+    "electron": "^41.2.0",
+    "electron-builder": "^26.8.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.21.0",
+    "typescript": "^5",
+    "wait-on": "^9.0.5"
   }
 }
