@@ -1,4 +1,5 @@
-import { EditorView } from "@codemirror/view"
+import { EditorView, WidgetType, Decoration, DecorationSet } from "@codemirror/view"
+import { StateField, StateEffect, Range } from "@codemirror/state"
 import { uploadAndGetMarkdown } from "@/lib/upload"
 
 type SlashCommand = {
@@ -8,6 +9,143 @@ type SlashCommand = {
 }
 
 const BRANCH_RE = /^\/branch\s+([\w\-.]+)\/([\w\-.]+)\s+([\w\-.\/]+)\s+([\w\-.\/]+)$/
+
+// Unique placeholder text used to anchor the confirmation widget
+const BRANCH_CONFIRM_PREFIX = "::branch-confirm::"
+
+const showBranchConfirm = StateEffect.define<{
+  from: number
+  to: number
+  owner: string
+  repo: string
+  baseBranch: string
+  newBranchName: string
+  originalText: string
+}>()
+
+const clearBranchConfirm = StateEffect.define<void>()
+
+class BranchConfirmWidget extends WidgetType {
+  constructor(
+    readonly owner: string,
+    readonly repo: string,
+    readonly baseBranch: string,
+    readonly newBranchName: string,
+    readonly originalText: string,
+    readonly from: number,
+    readonly to: number,
+  ) {
+    super()
+  }
+
+  eq(other: BranchConfirmWidget) {
+    return this.owner === other.owner && this.repo === other.repo && this.newBranchName === other.newBranchName
+  }
+
+  toDOM(view: EditorView) {
+    const wrapper = document.createElement("div")
+    wrapper.className = "cm-branch-confirm"
+
+    const label = document.createElement("span")
+    label.className = "cm-branch-confirm-label"
+    label.textContent = `create branch "${this.newBranchName}" from "${this.baseBranch}" on ${this.owner}/${this.repo}?`
+    wrapper.appendChild(label)
+
+    const yesBtn = document.createElement("button")
+    yesBtn.className = "cm-branch-confirm-yes"
+    yesBtn.textContent = "[yes]"
+    yesBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      // Find the placeholder text position
+      const doc = view.state.doc.toString()
+      const placeholder = `${BRANCH_CONFIRM_PREFIX}${this.owner}/${this.repo}/${this.newBranchName}`
+      const idx = doc.indexOf(placeholder)
+      if (idx === -1) return
+
+      const placeholderEnd = idx + placeholder.length
+      const creatingText = `creating branch ${this.newBranchName}...`
+
+      view.dispatch({
+        changes: { from: idx, to: placeholderEnd, insert: creatingText },
+        effects: clearBranchConfirm.of(),
+      })
+
+      fetch(`/api/github/repos/${this.owner}/${this.repo}/branches`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ baseBranch: this.baseBranch, newBranchName: this.newBranchName }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          const d = view.state.doc.toString()
+          const i = d.indexOf(creatingText)
+          if (i === -1) return
+          const result = data.error ? `branch failed: ${data.error}` : `branch created: ${data.url}`
+          view.dispatch({ changes: { from: i, to: i + creatingText.length, insert: result } })
+        })
+        .catch(() => {
+          const d = view.state.doc.toString()
+          const i = d.indexOf(creatingText)
+          if (i === -1) return
+          view.dispatch({ changes: { from: i, to: i + creatingText.length, insert: "branch creation failed" } })
+        })
+    })
+    wrapper.appendChild(yesBtn)
+
+    const backBtn = document.createElement("button")
+    backBtn.className = "cm-branch-confirm-back"
+    backBtn.textContent = "[back]"
+    backBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      const doc = view.state.doc.toString()
+      const placeholder = `${BRANCH_CONFIRM_PREFIX}${this.owner}/${this.repo}/${this.newBranchName}`
+      const idx = doc.indexOf(placeholder)
+      if (idx === -1) return
+
+      view.dispatch({
+        changes: { from: idx, to: idx + placeholder.length, insert: this.originalText },
+        effects: clearBranchConfirm.of(),
+        selection: { anchor: idx + this.originalText.length },
+      })
+      view.focus()
+    })
+    wrapper.appendChild(backBtn)
+
+    return wrapper
+  }
+
+  ignoreEvent() {
+    return true
+  }
+}
+
+export const branchConfirmField = StateField.define<DecorationSet>({
+  create() {
+    return Decoration.none
+  },
+  update(deco, tr) {
+    for (const e of tr.effects) {
+      if (e.is(clearBranchConfirm)) {
+        return Decoration.none
+      }
+      if (e.is(showBranchConfirm)) {
+        const { from, to, owner, repo, baseBranch, newBranchName, originalText } = e.value
+        const widget = new BranchConfirmWidget(owner, repo, baseBranch, newBranchName, originalText, from, to)
+        const decos: Range<Decoration>[] = [
+          Decoration.replace({ widget, block: true }).range(from, to),
+        ]
+        return Decoration.set(decos)
+      }
+    }
+    if (tr.docChanged) {
+      return deco.map(tr.changes)
+    }
+    return deco
+  },
+  provide(field) {
+    return EditorView.decorations.from(field)
+  },
+})
 
 const commands: SlashCommand[] = [
   {
@@ -24,40 +162,20 @@ const commands: SlashCommand[] = [
       }
 
       const [, owner, repo, baseBranch, newBranchName] = m
+      const placeholder = `${BRANCH_CONFIRM_PREFIX}${owner}/${repo}/${newBranchName}`
+
       view.dispatch({
-        changes: { from: matchStart, to: matchEnd, insert: `creating branch ${newBranchName}...` },
+        changes: { from: matchStart, to: matchEnd, insert: placeholder },
+        effects: showBranchConfirm.of({
+          from: matchStart,
+          to: matchStart + placeholder.length,
+          owner,
+          repo,
+          baseBranch,
+          newBranchName,
+          originalText: text,
+        }),
       })
-
-      const placeholderText = `creating branch ${newBranchName}...`
-
-      fetch(`/api/github/repos/${owner}/${repo}/branches`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ baseBranch, newBranchName }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          const doc = view.state.doc.toString()
-          const idx = doc.indexOf(placeholderText)
-          if (idx === -1) return
-          if (data.error) {
-            view.dispatch({
-              changes: { from: idx, to: idx + placeholderText.length, insert: `branch failed: ${data.error}` },
-            })
-          } else {
-            view.dispatch({
-              changes: { from: idx, to: idx + placeholderText.length, insert: `branch created: ${data.url}` },
-            })
-          }
-        })
-        .catch(() => {
-          const doc = view.state.doc.toString()
-          const idx = doc.indexOf(placeholderText)
-          if (idx === -1) return
-          view.dispatch({
-            changes: { from: idx, to: idx + placeholderText.length, insert: `branch creation failed` },
-          })
-        })
     },
   },
   {

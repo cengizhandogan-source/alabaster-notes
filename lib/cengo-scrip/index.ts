@@ -6,7 +6,7 @@ import { editableTableField } from "./codemirror/editable-table-widget"
 import { aiPreviewField } from "./codemirror/ai-widget"
 import { inlineFormatPlugin } from "./codemirror/inline-format"
 import { checkboxPlugin } from "./codemirror/checkbox-widget"
-import { slashCommands } from "./codemirror/slash-commands"
+import { slashCommands, branchConfirmField } from "./codemirror/slash-commands"
 import { cengoScripTheme } from "./codemirror/theme"
 import { noteLinkPlugin, notesListFacet, noteNavigateFacet } from "./codemirror/note-link"
 import { noteAutocompletion } from "./codemirror/note-autocomplete"
@@ -29,7 +29,7 @@ interface CengoScripOptions {
 }
 
 export function cengoScripExtension(options: CengoScripOptions = {}): Extension {
-  const extensions: Extension[] = [highlightPlugin, tableExpand, slashCommands, mathPreviewPlugin, tablePreviewPlugin, editableTableField, aiPreviewField, inlineFormatPlugin, checkboxPlugin, fileDropExtension, imagePreviewPlugin, urlLinkPlugin, hrPlugin, sheetField, plotField, commitsField, cengoScripTheme]
+  const extensions: Extension[] = [highlightPlugin, tableExpand, slashCommands, branchConfirmField, mathPreviewPlugin, tablePreviewPlugin, editableTableField, aiPreviewField, inlineFormatPlugin, checkboxPlugin, fileDropExtension, imagePreviewPlugin, urlLinkPlugin, hrPlugin, sheetField, plotField, commitsField, cengoScripTheme]
 
   if (options.notes) {
     extensions.push(notesListFacet.of(options.notes), noteLinkPlugin, noteAutocompletion)

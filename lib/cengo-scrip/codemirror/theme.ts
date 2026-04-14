@@ -437,4 +437,46 @@ export const cengoScripTheme = EditorView.baseTheme({
     minWidth: "24px",
     textAlign: "right",
   },
+
+  // Branch confirmation widget
+  ".cm-branch-confirm": {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "6px 10px",
+    margin: "4px 0 4px 8px",
+    borderLeft: "3px solid var(--accent)",
+    background: "var(--surface)",
+    borderRadius: "0 4px 4px 0",
+    fontSize: "0.85em",
+    fontFamily: "var(--font-jetbrains-mono), monospace",
+  },
+  ".cm-branch-confirm-label": {
+    color: "var(--foreground)",
+  },
+  ".cm-branch-confirm-yes": {
+    background: "none",
+    border: "none",
+    color: "var(--accent)",
+    cursor: "pointer",
+    padding: "0",
+    fontSize: "inherit",
+    fontFamily: "inherit",
+    "&:hover": {
+      textDecoration: "underline",
+    },
+  },
+  ".cm-branch-confirm-back": {
+    background: "none",
+    border: "none",
+    color: "var(--muted)",
+    cursor: "pointer",
+    padding: "0",
+    fontSize: "inherit",
+    fontFamily: "inherit",
+    "&:hover": {
+      color: "var(--foreground)",
+      textDecoration: "underline",
+    },
+  },
 })
