@@ -2,13 +2,12 @@
 
 import { useState, useCallback, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { Note, Tag, GithubLink, GithubRepository } from "@/lib/types"
+import { Note, Tag, GithubRepository } from "@/lib/types"
 import { updateNote, deleteNote } from "@/actions/notes"
 import { uploadAndGetMarkdown } from "@/lib/upload"
 import { useAutoSave } from "@/hooks/use-auto-save"
 import { EditorToolbar } from "./editor-toolbar"
 import { MarkdownEditor } from "./markdown-editor"
-import { GithubPanel } from "./github-panel"
 import type { NoteRef } from "@/lib/cengo-scrip/utils/slugify"
 
 interface EditorProps {
@@ -19,12 +18,11 @@ interface EditorProps {
   onExpandSidebar?: () => void
   allTags?: Tag[]
   noteTagIds?: string[]
-  githubLinks?: GithubLink[]
   githubRepos?: GithubRepository[]
   githubConnected?: boolean
 }
 
-export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExpandSidebar, allTags = [], noteTagIds = [], githubLinks = [], githubRepos = [], githubConnected = false }: EditorProps) {
+export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExpandSidebar, allTags = [], noteTagIds = [], githubRepos = [], githubConnected = false }: EditorProps) {
   const router = useRouter()
   const onNavigateNote = useCallback((id: string) => router.push(`/notes/${id}`), [router])
   const [title, setTitle] = useState(note.title)
@@ -116,13 +114,7 @@ export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExp
         onExpandSidebar={onExpandSidebar}
         noteKey={note.note_key}
       />
-      <GithubPanel
-        noteId={note.id}
-        links={githubLinks}
-        repositories={githubRepos}
-        isConnected={githubConnected}
-      />
-      <MarkdownEditor content={content} onChange={handleContentChange} notes={notes} onNavigateNote={onNavigateNote} />
+      <MarkdownEditor content={content} onChange={handleContentChange} notes={notes} onNavigateNote={onNavigateNote} githubRepos={githubRepos} />
     </div>
   )
 }

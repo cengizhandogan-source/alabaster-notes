@@ -63,3 +63,14 @@ export function listCommits(token: string, owner: string, repo: string, branch?:
 export function getGithubUser(token: string) {
   return githubFetch(token, "/user")
 }
+
+export async function createBranch(token: string, owner: string, repo: string, baseBranch: string, newBranchName: string) {
+  const ref = await githubFetch(token, `/repos/${owner}/${repo}/git/ref/heads/${baseBranch}`)
+  const sha = ref.object.sha
+  const result = await githubFetch(token, `/repos/${owner}/${repo}/git/refs`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ref: `refs/heads/${newBranchName}`, sha }),
+  })
+  return { name: newBranchName, url: `https://github.com/${owner}/${repo}/tree/${newBranchName}`, sha: result.object.sha }
+}

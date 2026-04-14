@@ -335,4 +335,106 @@ export const cengoScripTheme = EditorView.baseTheme({
     fontSize: "0.85em",
     fontStyle: "italic",
   },
+
+  // Commits widget
+  ".cm-cengo-commits": {
+    color: "var(--accent)",
+    fontWeight: "500",
+  },
+  ".cm-commits-widget": {
+    borderLeft: "3px solid var(--accent)",
+    margin: "4px 0 4px 8px",
+    padding: "0",
+    background: "var(--surface)",
+    borderRadius: "0 4px 4px 0",
+    fontSize: "0.85em",
+    fontFamily: "var(--font-jetbrains-mono), monospace",
+  },
+  ".cm-commits-header": {
+    fontSize: "0.75em",
+    color: "var(--accent)",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    fontWeight: "600",
+    padding: "6px 10px",
+    borderBottom: "1px solid var(--border)",
+  },
+  ".cm-commits-loading": {
+    color: "var(--muted)",
+    padding: "8px 10px",
+    fontStyle: "italic",
+  },
+  ".cm-commits-empty": {
+    color: "var(--muted)",
+    padding: "8px 10px",
+    fontStyle: "italic",
+  },
+  ".cm-commits-graph": {
+    padding: "4px 0",
+    maxHeight: "400px",
+    overflowY: "auto",
+  },
+  ".cm-commits-row": {
+    display: "flex",
+    alignItems: "center",
+    padding: "2px 10px",
+    lineHeight: "1.6",
+    "&:hover": {
+      background: "color-mix(in srgb, var(--border) 30%, transparent)",
+    },
+  },
+  ".cm-commits-graph-col": {
+    display: "inline-flex",
+    gap: "0",
+    minWidth: "20px",
+    marginRight: "8px",
+    whiteSpace: "pre",
+  },
+  ".cm-commits-dot": {
+    fontWeight: "bold",
+  },
+  ".cm-commits-line": {
+    opacity: "0.5",
+  },
+  ".cm-commits-merge": {
+    opacity: "0.7",
+    marginLeft: "2px",
+  },
+  ".cm-commits-details": {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    flex: "1",
+    minWidth: "0",
+    overflow: "hidden",
+  },
+  ".cm-commits-sha": {
+    color: "var(--accent)",
+    textDecoration: "none",
+    fontWeight: "500",
+    flexShrink: "0",
+    "&:hover": {
+      textDecoration: "underline",
+    },
+  },
+  ".cm-commits-msg": {
+    color: "var(--foreground)",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    flex: "1",
+    minWidth: "0",
+  },
+  ".cm-commits-author": {
+    color: "var(--muted)",
+    flexShrink: "0",
+    fontSize: "0.9em",
+  },
+  ".cm-commits-time": {
+    color: "var(--muted)",
+    flexShrink: "0",
+    fontSize: "0.85em",
+    minWidth: "24px",
+    textAlign: "right",
+  },
 })

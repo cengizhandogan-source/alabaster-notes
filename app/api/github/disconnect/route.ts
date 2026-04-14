@@ -6,7 +6,6 @@ export async function POST() {
   if (!user) return Response.json({ error: "unauthorized" }, { status: 401 })
 
   // Delete all GitHub data for the user
-  await supabase.from("github_links").delete().eq("user_id", user.id)
   await supabase.from("github_repositories").delete().eq("user_id", user.id)
   await supabase.from("github_connections").delete().eq("user_id", user.id)
 

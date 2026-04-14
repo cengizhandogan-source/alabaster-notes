@@ -10,6 +10,7 @@ import { tags } from "@lezer/highlight"
 import { searchKeymap } from "@codemirror/search"
 import { cengoScripExtension } from "@/lib/cengo-scrip"
 import type { NoteRef } from "@/lib/cengo-scrip/utils/slugify"
+import type { GithubRepository } from "@/lib/types"
 
 const markdownHighlight = syntaxHighlighting(
   HighlightStyle.define([
@@ -65,9 +66,10 @@ interface MarkdownEditorProps {
   onChange: (content: string) => void
   notes?: NoteRef[]
   onNavigateNote?: (noteId: string) => void
+  githubRepos?: GithubRepository[]
 }
 
-export function MarkdownEditor({ content, onChange, notes, onNavigateNote }: MarkdownEditorProps) {
+export function MarkdownEditor({ content, onChange, notes, onNavigateNote, githubRepos }: MarkdownEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
 
@@ -82,7 +84,11 @@ export function MarkdownEditor({ content, onChange, notes, onNavigateNote }: Mar
         history(),
         markdown(),
         markdownHighlight,
-        cengoScripExtension({ notes, onNavigate: onNavigateNote }),
+        cengoScripExtension({
+          notes,
+          onNavigate: onNavigateNote,
+          repos: githubRepos?.map((r) => ({ owner: r.owner, name: r.name, full_name: r.full_name, default_branch: r.default_branch })),
+        }),
         placeholder("> start writing..."),
         keymap.of([
           { key: "Tab", run: (view) => { view.dispatch(view.state.replaceSelection("  ")); return true } },

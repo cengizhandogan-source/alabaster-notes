@@ -19,12 +19,14 @@ export async function GET(
   const commits = await listCommits(token, owner, name, branch)
 
   return Response.json(
-    commits.map((c: { sha: string; commit: { message: string }; html_url: string; author: { login: string } | null }) => ({
+    commits.map((c: { sha: string; commit: { message: string; author: { date: string } }; html_url: string; author: { login: string } | null; parents: { sha: string }[] }) => ({
       sha: c.sha.slice(0, 7),
       fullSha: c.sha,
       message: c.commit.message.split("\n")[0],
       url: c.html_url,
       author: c.author?.login ?? "unknown",
+      date: c.commit.author.date,
+      parents: c.parents.map((p) => p.sha.slice(0, 7)),
     }))
   )
 }

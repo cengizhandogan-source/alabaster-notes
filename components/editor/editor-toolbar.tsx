@@ -81,25 +81,6 @@ export function EditorToolbar({
         {statusText[status]}
       </span>
 
-      {/* Settings */}
-      <a
-        href="/settings"
-        className="text-xs text-secondary hover:text-accent transition-colors duration-100 p-1.5"
-        title="Settings"
-      >
-        settings
-      </a>
-
-      {/* Commands page */}
-      <a
-        href="/commands"
-        target="_blank"
-        className="text-xs text-secondary hover:text-accent transition-colors duration-100 p-1.5"
-        title="View commands"
-      >
-        cmds
-      </a>
-
       {/* Attach file */}
       {onUploadFile && (
         <button
@@ -118,6 +99,25 @@ export function EditorToolbar({
       >
         delete
       </button>
+
+      {/* Settings */}
+      <a
+        href="/settings"
+        className="text-xs text-secondary hover:text-accent transition-colors duration-100 p-1.5"
+        title="Settings"
+      >
+        settings
+      </a>
+
+      {/* Commands page */}
+      <a
+        href="/commands"
+        target="_blank"
+        className="text-xs text-secondary hover:text-accent transition-colors duration-100 p-1.5"
+        title="View commands"
+      >
+        cmds
+      </a>
     </div>
   )
 }

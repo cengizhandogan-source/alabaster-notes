@@ -12,13 +12,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect("/login")
   }
 
-  const [{ data: notes }, { data: folders }, { data: tags }, { data: noteTags }, { data: folderTags }, { data: githubLinks }, { data: githubRepos }, { data: githubConnection }] = await Promise.all([
+  const [{ data: notes }, { data: folders }, { data: tags }, { data: noteTags }, { data: folderTags }, { data: githubRepos }, { data: githubConnection }] = await Promise.all([
     supabase.from("notes").select("*").order("position", { ascending: true }),
     supabase.from("folders").select("*").order("position", { ascending: true }),
     supabase.from("tags").select("*").order("name", { ascending: true }),
     supabase.from("note_tags").select("*"),
     supabase.from("folder_tags").select("*"),
-    supabase.from("github_links").select("*"),
     supabase.from("github_repositories").select("*"),
     supabase.from("github_connections").select("id, user_id, github_user_id, github_username, scopes, created_at, updated_at"),
   ])
@@ -36,7 +35,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         tags={tags ?? []}
         noteTags={noteTags ?? []}
         folderTags={folderTags ?? []}
-        githubLinks={githubLinks ?? []}
         githubRepos={githubRepos ?? []}
         githubConnected={!!githubConnection}
       >

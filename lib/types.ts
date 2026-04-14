@@ -64,18 +64,3 @@ export type GithubRepository = {
   created_at: string
 }
 
-export type GithubLink = {
-  id: string
-  user_id: string
-  note_id: string | null
-  folder_id: string | null
-  repo_id: string
-  entity_type: "branch" | "pull_request" | "commit"
-  entity_ref: string
-  entity_title: string | null
-  entity_url: string | null
-  entity_state: string | null
-  entity_author: string | null
-  created_at: string
-  updated_at: string
-}

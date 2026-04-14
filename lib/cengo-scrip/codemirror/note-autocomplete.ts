@@ -1,5 +1,6 @@
 import { autocompletion, CompletionContext, CompletionResult } from "@codemirror/autocomplete"
 import { notesListFacet } from "./note-link"
+import { branchCompletionSource } from "./branch-autocomplete"
 
 function noteCompletionSource(context: CompletionContext): CompletionResult | null {
   const match = context.matchBefore(/@[\w-]*/)
@@ -18,6 +19,6 @@ function noteCompletionSource(context: CompletionContext): CompletionResult | nu
 }
 
 export const noteAutocompletion = autocompletion({
-  override: [noteCompletionSource],
+  override: [noteCompletionSource, branchCompletionSource],
   activateOnTyping: true,
 })

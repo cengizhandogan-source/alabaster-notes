@@ -1,6 +1,6 @@
 "use client"
 
-import { Note, Folder, FolderTreeNode, Tag, NoteTag, FolderTag, GithubLink, GithubRepository } from "@/lib/types"
+import { Note, Folder, FolderTreeNode, Tag, NoteTag, FolderTag, GithubRepository } from "@/lib/types"
 import { Sidebar } from "./sidebar"
 import { useSidebar } from "@/hooks/use-sidebar"
 import { useParams } from "next/navigation"
@@ -25,7 +25,6 @@ export const SidebarContext = createContext<{
   tags: Tag[]
   noteTags: NoteTag[]
   folderTags: FolderTag[]
-  githubLinks: GithubLink[]
   githubRepos: GithubRepository[]
   githubConnected: boolean
 }>({
@@ -37,7 +36,7 @@ export const SidebarContext = createContext<{
   tags: [],
   noteTags: [],
   folderTags: [],
-  githubLinks: [],
+
   githubRepos: [],
   githubConnected: false,
 })
@@ -51,13 +50,12 @@ interface AppShellProps {
   tags: Tag[]
   noteTags: NoteTag[]
   folderTags: FolderTag[]
-  githubLinks: GithubLink[]
   githubRepos: GithubRepository[]
   githubConnected: boolean
   children: React.ReactNode
 }
 
-export function AppShell({ notes, folders, folderTree, unfiledNotes, tags, noteTags, folderTags, githubLinks, githubRepos, githubConnected, children }: AppShellProps) {
+export function AppShell({ notes, folders, folderTree, unfiledNotes, tags, noteTags, folderTags, githubRepos, githubConnected, children }: AppShellProps) {
   const { isOpen, close, toggle, isCollapsed, toggleCollapse } = useSidebar()
   const params = useParams()
   const activeNoteId = params?.id as string | undefined
@@ -68,7 +66,7 @@ export function AppShell({ notes, folders, folderTree, unfiledNotes, tags, noteT
   }, [])
 
   return (
-    <SidebarContext.Provider value={{ toggle, isCollapsed, toggleCollapse, notes, folders, tags, noteTags, folderTags, githubLinks, githubRepos, githubConnected }}>
+    <SidebarContext.Provider value={{ toggle, isCollapsed, toggleCollapse, notes, folders, tags, noteTags, folderTags, githubRepos, githubConnected }}>
       <div className="flex flex-col h-screen bg-background safe-top safe-left safe-right">
         {isElectron && <div className="h-9 flex-shrink-0 border-b border-border drag-region" />}
         <div className="flex flex-1 min-h-0">

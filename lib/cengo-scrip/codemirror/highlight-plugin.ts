@@ -31,6 +31,11 @@ const plotDecorator = new MatchDecorator({
   decoration: Decoration.mark({ class: "cm-cengo-plot" }),
 })
 
+const commitsDecorator = new MatchDecorator({
+  regexp: /^::commits\[[^\]]+\]\s*$/gm,
+  decoration: Decoration.mark({ class: "cm-cengo-commits" }),
+})
+
 export const highlightPlugin = ViewPlugin.fromClass(
   class {
     aiDeco: DecorationSet
@@ -40,6 +45,7 @@ export const highlightPlugin = ViewPlugin.fromClass(
 
     sheetDeco: DecorationSet
     plotDeco: DecorationSet
+    commitsDeco: DecorationSet
 
     constructor(view: import("@codemirror/view").EditorView) {
       this.aiDeco = aiDecorator.createDeco(view)
@@ -48,6 +54,7 @@ export const highlightPlugin = ViewPlugin.fromClass(
       this.noteLinkDeco = noteLinkDecorator.createDeco(view)
       this.sheetDeco = sheetDecorator.createDeco(view)
       this.plotDeco = plotDecorator.createDeco(view)
+      this.commitsDeco = commitsDecorator.createDeco(view)
     }
 
     update(update: ViewUpdate) {
@@ -57,9 +64,10 @@ export const highlightPlugin = ViewPlugin.fromClass(
       this.noteLinkDeco = noteLinkDecorator.updateDeco(update, this.noteLinkDeco)
       this.sheetDeco = sheetDecorator.updateDeco(update, this.sheetDeco)
       this.plotDeco = plotDecorator.updateDeco(update, this.plotDeco)
+      this.commitsDeco = commitsDecorator.updateDeco(update, this.commitsDeco)
     }
   },
   {
-    decorations: (v) => RangeSet.join([v.aiDeco, v.tableDeco, v.mathDeco, v.noteLinkDeco, v.sheetDeco, v.plotDeco]),
+    decorations: (v) => RangeSet.join([v.aiDeco, v.tableDeco, v.mathDeco, v.noteLinkDeco, v.sheetDeco, v.plotDeco, v.commitsDeco]),
   }
 )

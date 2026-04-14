@@ -3,10 +3,72 @@ import { uploadAndGetMarkdown } from "@/lib/upload"
 
 type SlashCommand = {
   pattern: string
+  multiWord?: boolean
   handle: (view: EditorView, matchStart: number, matchEnd: number) => void
 }
 
+const BRANCH_RE = /^\/branch\s+([\w\-.]+)\/([\w\-.]+)\s+([\w\-.\/]+)\s+([\w\-.\/]+)$/
+
 const commands: SlashCommand[] = [
+  {
+    pattern: "/branch",
+    multiWord: true,
+    handle(view, matchStart, matchEnd) {
+      const text = view.state.doc.sliceString(matchStart, matchEnd)
+      const m = text.match(BRANCH_RE)
+      if (!m) {
+        view.dispatch({
+          changes: { from: matchStart, to: matchEnd, insert: "usage: /branch owner/repo base-branch new-branch-name" },
+        })
+        return
+      }
+
+      const [, owner, repo, baseBranch, newBranchName] = m
+      view.dispatch({
+        changes: { from: matchStart, to: matchEnd, insert: `creating branch ${newBranchName}...` },
+      })
+
+      const placeholderText = `creating branch ${newBranchName}...`
+
+      fetch(`/api/github/repos/${owner}/${repo}/branches`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ baseBranch, newBranchName }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          const doc = view.state.doc.toString()
+          const idx = doc.indexOf(placeholderText)
+          if (idx === -1) return
+          if (data.error) {
+            view.dispatch({
+              changes: { from: idx, to: idx + placeholderText.length, insert: `branch failed: ${data.error}` },
+            })
+          } else {
+            view.dispatch({
+              changes: { from: idx, to: idx + placeholderText.length, insert: `branch created: ${data.url}` },
+            })
+          }
+        })
+        .catch(() => {
+          const doc = view.state.doc.toString()
+          const idx = doc.indexOf(placeholderText)
+          if (idx === -1) return
+          view.dispatch({
+            changes: { from: idx, to: idx + placeholderText.length, insert: `branch creation failed` },
+          })
+        })
+    },
+  },
+  {
+    pattern: "/commits",
+    handle(view, matchStart, matchEnd) {
+      view.dispatch({
+        changes: { from: matchStart, to: matchEnd, insert: "::commits[owner/repo@branch]" },
+        selection: { anchor: matchStart + "::commits[".length, head: matchStart + "::commits[owner/repo@branch".length },
+      })
+    },
+  },
   {
     pattern: "/date",
     handle(view, matchStart, matchEnd) {
@@ -166,7 +228,14 @@ export const slashCommands = EditorView.inputHandler.of((view, from, _to, text) 
   const lineText = line.text.slice(0, from - line.from)
 
   for (const cmd of commands) {
-    if (lineText.endsWith(cmd.pattern)) {
+    if (cmd.multiWord) {
+      // Multi-word commands: match full line starting with the pattern
+      const fullLineMatch = BRANCH_RE.test(lineText)
+      if (fullLineMatch) {
+        cmd.handle(view, line.from, from)
+        return true
+      }
+    } else if (lineText.endsWith(cmd.pattern)) {
       const matchStart = from - cmd.pattern.length
       cmd.handle(view, matchStart, from)
       return true
