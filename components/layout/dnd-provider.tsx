@@ -205,6 +205,7 @@ export function DndProvider({ folderTree, unfiledNotes, allFolders, allNotes, ch
   return (
     <DndStateContext.Provider value={state}>
       <DndContext
+        id="dnd"
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}
