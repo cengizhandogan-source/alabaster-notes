@@ -103,6 +103,9 @@ export function NoteListItem({
           </div>
           <div className="flex items-center justify-between mt-0.5 ml-[19px]">
             <span className="text-xs text-muted truncate flex-1">{preview}</span>
+            {note.note_key && (
+              <span className="text-[10px] text-muted ml-1 shrink-0">{note.note_key}</span>
+            )}
             <span className="text-xs text-muted ml-2 whitespace-nowrap">
               {timeAgo(note.updated_at)}
             </span>

@@ -9,6 +9,7 @@ interface EditorToolbarProps {
   onToggleSidebar?: () => void
   isSidebarCollapsed?: boolean
   onExpandSidebar?: () => void
+  noteKey?: string | null
 }
 
 export function EditorToolbar({
@@ -20,6 +21,7 @@ export function EditorToolbar({
   onToggleSidebar,
   isSidebarCollapsed,
   onExpandSidebar,
+  noteKey,
 }: EditorToolbarProps) {
   const statusText = {
     idle: "",
@@ -58,6 +60,13 @@ export function EditorToolbar({
         </button>
       )}
 
+      {/* Note key */}
+      {noteKey && (
+        <span className="text-xs text-muted bg-surface px-1.5 py-0.5 border border-border shrink-0">
+          {noteKey}
+        </span>
+      )}
+
       {/* Title input */}
       <input
         type="text"
@@ -71,6 +80,15 @@ export function EditorToolbar({
       <span className={`text-xs ${statusColor[status]} whitespace-nowrap`}>
         {statusText[status]}
       </span>
+
+      {/* Settings */}
+      <a
+        href="/settings"
+        className="text-xs text-secondary hover:text-accent transition-colors duration-100 p-1.5"
+        title="Settings"
+      >
+        settings
+      </a>
 
       {/* Commands page */}
       <a

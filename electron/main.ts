@@ -84,6 +84,12 @@ function startNextServer(port: number): Electron.UtilityProcess {
   if (settings.OPENAI_API_KEY) {
     env.OPENAI_API_KEY = settings.OPENAI_API_KEY;
   }
+  if (settings.GITHUB_CLIENT_ID) {
+    env.GITHUB_CLIENT_ID = settings.GITHUB_CLIENT_ID;
+  }
+  if (settings.GITHUB_CLIENT_SECRET) {
+    env.GITHUB_CLIENT_SECRET = settings.GITHUB_CLIENT_SECRET;
+  }
 
   const child = utilityProcess.fork(serverJs, [], {
     cwd: standaloneDir,
