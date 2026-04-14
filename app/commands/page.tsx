@@ -80,9 +80,21 @@ export default function CommandsPage() {
                   <td className="px-4 py-2 text-accent">/sheet</td>
                   <td className="px-4 py-2">inserts a spreadsheet block</td>
                 </tr>
-                <tr>
+                <tr className="border-b border-border">
                   <td className="px-4 py-2 text-accent">/plot</td>
                   <td className="px-4 py-2">inserts a chart linked to a sheet</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="px-4 py-2 text-accent">/branch</td>
+                  <td className="px-4 py-2">
+                    creates a GitHub branch — usage: /branch owner/repo base-branch new-branch
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-2 text-accent">/commits</td>
+                  <td className="px-4 py-2">
+                    inserts a ::commits widget for viewing commit history
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -142,10 +154,16 @@ export default function CommandsPage() {
                     chart from sheet data — line, bar, scatter, or pie
                   </td>
                 </tr>
-                <tr>
+                <tr className="border-b border-border">
                   <td className="px-4 py-2 text-accent">=@slug#Sheet.A1</td>
                   <td className="px-4 py-2">
                     cross-note cell reference in formulas
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-2 text-accent">::commits[owner/repo@branch]</td>
+                  <td className="px-4 py-2">
+                    live commit history graph with branch topology
                   </td>
                 </tr>
               </tbody>
