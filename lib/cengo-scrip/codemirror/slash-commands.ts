@@ -97,6 +97,26 @@ const commands: SlashCommand[] = [
     },
   },
   {
+    pattern: "/sheet",
+    handle(view, matchStart, matchEnd) {
+      const template = `::sheet[Sheet1]\n\t\t\n\t\t\n\t\t\n::endsheet`
+      view.dispatch({
+        changes: { from: matchStart, to: matchEnd, insert: template },
+        selection: { anchor: matchStart + "::sheet[".length, head: matchStart + "::sheet[Sheet1".length },
+      })
+    },
+  },
+  {
+    pattern: "/plot",
+    handle(view, matchStart, matchEnd) {
+      const template = `::plot[Sheet1|line|A|B]`
+      view.dispatch({
+        changes: { from: matchStart, to: matchEnd, insert: template },
+        selection: { anchor: matchStart + "::plot[".length, head: matchStart + "::plot[Sheet1".length },
+      })
+    },
+  },
+  {
     pattern: "/file",
     handle(view, matchStart, matchEnd) {
       view.dispatch({

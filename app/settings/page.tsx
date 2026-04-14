@@ -3,15 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
-declare global {
-  interface Window {
-    electronAPI?: {
-      platform: string
-      getSettings: () => Promise<Record<string, string>>
-      saveSettings: (settings: Record<string, string>) => Promise<boolean>
-    }
-  }
-}
+// electronAPI type is declared in app-shell.tsx
 
 export default function SettingsPage() {
   const router = useRouter()

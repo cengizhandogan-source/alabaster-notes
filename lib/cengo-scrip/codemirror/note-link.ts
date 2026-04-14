@@ -37,7 +37,7 @@ class NoteLinkWidget extends WidgetType {
   }
 
   ignoreEvent() {
-    return false
+    return true
   }
 }
 

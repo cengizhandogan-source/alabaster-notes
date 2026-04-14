@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import { AnimatePresence, motion } from "motion/react"
 import { toast } from "sonner"
 import { Tag } from "@/lib/types"
 import { createTag, updateTag, deleteTag } from "@/actions/tags"
@@ -34,8 +35,6 @@ export function TagManager({ tags, isOpen, onClose }: TagManagerProps) {
     document.addEventListener("mousedown", handleClick)
     return () => document.removeEventListener("mousedown", handleClick)
   }, [isOpen, onClose])
-
-  if (!isOpen) return null
 
   const handleCreate = async () => {
     const trimmed = newName.trim()
@@ -75,7 +74,16 @@ export function TagManager({ tags, isOpen, onClose }: TagManagerProps) {
   }
 
   return (
-    <div ref={ref} className="absolute left-0 top-full z-50 bg-background border border-border shadow-md py-2 min-w-[220px] max-h-[320px] overflow-y-auto">
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          ref={ref}
+          initial={{ opacity: 0, scale: 0.95, y: -4 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -4 }}
+          transition={{ duration: 0.12 }}
+          className="absolute left-0 top-full z-50 bg-background border border-border shadow-md py-2 min-w-[220px] max-w-[calc(100vw-64px)] max-h-[320px] overflow-y-auto"
+        >
       <div className="px-3 py-1 text-xs text-muted">Tags</div>
 
       {tags.map((tag) => (
@@ -174,6 +182,8 @@ export function TagManager({ tags, isOpen, onClose }: TagManagerProps) {
           + create tag
         </button>
       </div>
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }

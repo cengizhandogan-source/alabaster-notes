@@ -165,6 +165,25 @@ export const cengoScripTheme = EditorView.baseTheme({
     textUnderlineOffset: "2px",
   },
 
+  // URL link
+  ".cm-url-link-widget": {
+    color: "var(--accent)",
+    textDecoration: "underline",
+    textUnderlineOffset: "2px",
+    cursor: "pointer",
+    "&:hover": {
+      opacity: "0.8",
+    },
+  },
+
+  // Horizontal rule widget
+  ".cm-hr-widget": {
+    border: "none",
+    borderTop: "1px solid var(--border)",
+    margin: "8px 0",
+    width: "100%",
+  },
+
   // Image widget
   ".cm-image-widget-wrapper": {
     padding: "4px 0",
@@ -176,5 +195,144 @@ export const cengoScripTheme = EditorView.baseTheme({
     objectFit: "contain",
     borderRadius: "4px",
     border: "1px solid var(--border)",
+  },
+
+  // Sheet widget
+  ".cm-sheet-widget": {
+    borderLeft: "3px solid var(--accent)",
+    margin: "4px 0 4px 8px",
+    padding: "0",
+    background: "var(--surface)",
+    borderRadius: "0 4px 4px 0",
+    fontSize: "0.875em",
+  },
+  ".cm-sheet-header": {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "6px 10px",
+    borderBottom: "1px solid var(--border)",
+  },
+  ".cm-sheet-name": {
+    fontSize: "0.75em",
+    color: "var(--accent)",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    fontWeight: "600",
+  },
+  ".cm-sheet-controls": {
+    display: "flex",
+    gap: "4px",
+  },
+  ".cm-sheet-add-btn": {
+    fontSize: "0.7em",
+    padding: "2px 8px",
+    border: "1px solid var(--border)",
+    borderRadius: "3px",
+    background: "transparent",
+    color: "var(--muted)",
+    cursor: "pointer",
+    "&:hover": {
+      color: "var(--accent)",
+      borderColor: "var(--accent)",
+    },
+  },
+  ".cm-sheet-formula-bar": {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "4px 10px",
+    borderBottom: "1px solid var(--border)",
+    fontSize: "0.8em",
+    minHeight: "24px",
+  },
+  ".cm-sheet-cell-label": {
+    color: "var(--accent)",
+    fontWeight: "600",
+    minWidth: "30px",
+  },
+  ".cm-sheet-formula-input": {
+    color: "var(--foreground)",
+    flex: "1",
+  },
+  ".cm-sheet-grid": {
+    width: "100%",
+    borderCollapse: "collapse",
+  },
+  ".cm-sheet-grid th, .cm-sheet-grid td": {
+    border: "1px solid var(--border)",
+    padding: "3px 8px",
+    textAlign: "left",
+    outline: "none",
+    minWidth: "60px",
+  },
+  ".cm-sheet-corner": {
+    width: "32px",
+    minWidth: "32px",
+    background: "color-mix(in srgb, var(--surface) 80%, transparent)",
+  },
+  ".cm-sheet-col-header": {
+    background: "color-mix(in srgb, var(--surface) 80%, transparent)",
+    fontWeight: "500",
+    textAlign: "center !important",
+    color: "var(--muted)",
+    fontSize: "0.85em",
+  },
+  ".cm-sheet-row-header": {
+    background: "color-mix(in srgb, var(--surface) 80%, transparent)",
+    fontWeight: "500",
+    textAlign: "center !important",
+    color: "var(--muted)",
+    fontSize: "0.85em",
+    width: "32px",
+    minWidth: "32px",
+  },
+  ".cm-sheet-cell-active": {
+    boxShadow: "inset 0 0 0 1.5px var(--accent)",
+    borderRadius: "1px",
+  },
+  ".cm-sheet-grid td:empty::before": {
+    content: "'\\00a0'",
+  },
+
+  // Sheet/plot syntax highlights
+  ".cm-cengo-sheet": {
+    color: "var(--accent)",
+    fontWeight: "500",
+  },
+  ".cm-cengo-plot": {
+    color: "var(--accent)",
+    fontStyle: "italic",
+  },
+
+  // Plot widget
+  ".cm-plot-widget": {
+    borderLeft: "3px solid var(--accent)",
+    margin: "4px 0 4px 8px",
+    padding: "8px",
+    background: "var(--surface)",
+    borderRadius: "0 4px 4px 0",
+  },
+  ".cm-plot-header": {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: "8px",
+  },
+  ".cm-plot-label": {
+    fontSize: "0.75em",
+    color: "var(--accent)",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    fontWeight: "600",
+  },
+  ".cm-plot-canvas": {
+    width: "100%",
+    maxHeight: "300px",
+  },
+  ".cm-plot-error": {
+    color: "var(--error)",
+    fontSize: "0.85em",
+    fontStyle: "italic",
   },
 })

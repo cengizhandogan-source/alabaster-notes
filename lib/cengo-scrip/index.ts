@@ -12,6 +12,10 @@ import { noteLinkPlugin, notesListFacet, noteNavigateFacet } from "./codemirror/
 import { noteAutocompletion } from "./codemirror/note-autocomplete"
 import { fileDropExtension } from "./codemirror/file-drop"
 import { imagePreviewPlugin } from "./codemirror/image-widget"
+import { urlLinkPlugin } from "./codemirror/url-link"
+import { hrPlugin } from "./codemirror/hr-widget"
+import { sheetField } from "./codemirror/sheet-widget"
+import { plotField } from "./codemirror/plot-widget"
 import type { Extension } from "@codemirror/state"
 import type { NoteRef } from "./utils/slugify"
 
@@ -21,7 +25,7 @@ interface CengoScripOptions {
 }
 
 export function cengoScripExtension(options: CengoScripOptions = {}): Extension {
-  const extensions: Extension[] = [highlightPlugin, tableExpand, slashCommands, mathPreviewPlugin, tablePreviewPlugin, editableTableField, aiPreviewField, inlineFormatPlugin, checkboxPlugin, fileDropExtension, imagePreviewPlugin, cengoScripTheme]
+  const extensions: Extension[] = [highlightPlugin, tableExpand, slashCommands, mathPreviewPlugin, tablePreviewPlugin, editableTableField, aiPreviewField, inlineFormatPlugin, checkboxPlugin, fileDropExtension, imagePreviewPlugin, urlLinkPlugin, hrPlugin, sheetField, plotField, cengoScripTheme]
 
   if (options.notes) {
     extensions.push(notesListFacet.of(options.notes), noteLinkPlugin, noteAutocompletion)

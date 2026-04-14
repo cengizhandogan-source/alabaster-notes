@@ -19,7 +19,7 @@ export function TagFilter({ tags, selectedTagIds, onToggleTag }: TagFilterProps)
           <button
             key={tag.id}
             onClick={() => onToggleTag(tag.id)}
-            className="shrink-0 text-xs px-2 py-0.5 rounded-sm border transition-colors duration-100"
+            className="shrink-0 text-xs px-2.5 py-1 rounded-sm border transition-colors duration-100"
             style={{
               borderColor: isSelected ? tag.color : undefined,
               backgroundColor: isSelected ? tag.color + "20" : undefined,

@@ -7,7 +7,6 @@ import { updateNote, deleteNote } from "@/actions/notes"
 import { uploadAndGetMarkdown } from "@/lib/upload"
 import { useAutoSave } from "@/hooks/use-auto-save"
 import { EditorToolbar } from "./editor-toolbar"
-import { NoteTags } from "./note-tags"
 import { MarkdownEditor } from "./markdown-editor"
 import type { NoteRef } from "@/lib/cengo-scrip/utils/slugify"
 
@@ -112,7 +111,6 @@ export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExp
         isSidebarCollapsed={isSidebarCollapsed}
         onExpandSidebar={onExpandSidebar}
       />
-      <NoteTags noteId={note.id} assignedTagIds={noteTagIds} allTags={allTags} />
       <MarkdownEditor content={content} onChange={handleContentChange} notes={notes} onNavigateNote={onNavigateNote} />
     </div>
   )

@@ -80,3 +80,31 @@ export async function removeTagFromNote(noteId: string, tagId: string) {
   if (error) throw new Error(error.message)
   revalidatePath("/notes")
 }
+
+export async function addTagToFolder(folderId: string, tagId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect("/login")
+
+  const { error } = await supabase
+    .from("folder_tags")
+    .insert({ folder_id: folderId, tag_id: tagId })
+
+  if (error) throw new Error(error.message)
+  revalidatePath("/notes")
+}
+
+export async function removeTagFromFolder(folderId: string, tagId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect("/login")
+
+  const { error } = await supabase
+    .from("folder_tags")
+    .delete()
+    .eq("folder_id", folderId)
+    .eq("tag_id", tagId)
+
+  if (error) throw new Error(error.message)
+  revalidatePath("/notes")
+}

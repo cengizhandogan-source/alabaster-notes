@@ -36,12 +36,12 @@ export function EditorToolbar({
   }
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-background">
+    <div className="flex items-center gap-2 lg:gap-3 px-3 lg:px-4 py-2 border-b border-border bg-background safe-right">
       {/* Mobile hamburger */}
       {onToggleSidebar && (
         <button
           onClick={onToggleSidebar}
-          className="lg:hidden text-secondary hover:text-foreground transition-colors duration-100"
+          className="lg:hidden text-secondary hover:text-foreground transition-colors duration-100 p-2 -ml-2"
         >
           |||
         </button>
@@ -64,7 +64,7 @@ export function EditorToolbar({
         value={title}
         onChange={(e) => onTitleChange(e.target.value)}
         placeholder="Untitled"
-        className="flex-1 bg-transparent text-foreground text-lg font-medium focus:outline-none placeholder:text-muted"
+        className="flex-1 bg-transparent text-foreground text-base lg:text-lg font-medium focus:outline-none placeholder:text-muted"
       />
 
       {/* Status */}
@@ -72,11 +72,21 @@ export function EditorToolbar({
         {statusText[status]}
       </span>
 
+      {/* Commands page */}
+      <a
+        href="/commands"
+        target="_blank"
+        className="text-xs text-secondary hover:text-accent transition-colors duration-100 p-1.5"
+        title="View commands"
+      >
+        cmds
+      </a>
+
       {/* Attach file */}
       {onUploadFile && (
         <button
           onClick={onUploadFile}
-          className="text-xs text-secondary hover:text-foreground transition-colors duration-100"
+          className="text-xs text-secondary hover:text-foreground transition-colors duration-100 p-1.5"
           title="Attach file"
         >
           attach
@@ -86,7 +96,7 @@ export function EditorToolbar({
       {/* Delete */}
       <button
         onClick={onDelete}
-        className="text-xs text-secondary hover:text-error transition-colors duration-100"
+        className="text-xs text-secondary hover:text-error transition-colors duration-100 p-1.5"
       >
         delete
       </button>

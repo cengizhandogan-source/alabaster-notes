@@ -6,6 +6,7 @@ import { createNote } from "@/actions/notes"
 import { createFolder } from "@/actions/folders"
 import { Tag } from "@/lib/types"
 import { TagManager } from "./tag-manager"
+import { FolderPlus } from "lucide-react"
 
 interface SidebarHeaderProps {
   onToggleCollapse?: () => void
@@ -52,13 +53,13 @@ export function SidebarHeader({ onToggleCollapse, search, onSearchChange, tags =
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="search..."
-          className="w-full bg-surface text-foreground text-sm pl-6 pr-2 py-1.5 border border-border focus:border-accent focus:outline-none placeholder:text-muted"
+          className="w-full bg-surface text-foreground text-sm pl-6 pr-2 py-2 border border-border focus:border-accent focus:outline-none placeholder:text-muted"
         />
       </div>
       <div className="relative">
         <button
           onClick={() => setShowTagManager(!showTagManager)}
-          className="text-secondary hover:text-foreground transition-colors duration-100 text-sm px-2 py-1 border border-border hover:border-accent"
+          className="text-secondary hover:text-foreground transition-colors duration-100 text-sm px-2.5 py-1.5 border border-border hover:border-accent"
           title="Manage tags"
         >
           #
@@ -67,14 +68,14 @@ export function SidebarHeader({ onToggleCollapse, search, onSearchChange, tags =
       </div>
       <button
         onClick={handleNewFolder}
-        className="text-secondary hover:text-foreground transition-colors duration-100 text-sm px-2 py-1 border border-border hover:border-accent"
+        className="text-secondary hover:text-foreground transition-colors duration-100 text-sm px-2.5 py-1.5 border border-border hover:border-accent"
         title="New folder"
       >
-        +/
+        <FolderPlus size={15} />
       </button>
       <button
         onClick={handleNewNote}
-        className="text-secondary hover:text-foreground transition-colors duration-100 text-lg px-2 py-1 border border-border hover:border-accent"
+        className="text-secondary hover:text-foreground transition-colors duration-100 text-lg px-2.5 py-1.5 border border-border hover:border-accent"
         title="New note"
       >
         +
