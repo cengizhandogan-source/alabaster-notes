@@ -1,5 +1,5 @@
-import { EditorView, Decoration, WidgetType, DecorationSet } from "@codemirror/view"
-import { EditorState, StateField, Range } from "@codemirror/state"
+import { EditorView, Decoration, WidgetType, DecorationSet, keymap } from "@codemirror/view"
+import { EditorState, EditorSelection, StateField, Range, Extension } from "@codemirror/state"
 
 const COMMITS_RE = /^::commits\[([^\]]+)\]\s*$/gm
 
@@ -246,6 +246,30 @@ function buildGraph(commits: CommitData[], owner: string, repo: string): HTMLEle
     while (lanes.length > 0 && lanes[lanes.length - 1] === null) {
       lanes.pop()
     }
+
+    // Add connector row between commits
+    if (commit !== commits[commits.length - 1] && lanes.some((l) => l !== null)) {
+      const connector = document.createElement("div")
+      connector.className = "cm-commits-connector"
+
+      const connGraphCol = document.createElement("span")
+      connGraphCol.className = "cm-commits-graph-col"
+
+      for (let i = 0; i < lanes.length; i++) {
+        const ch = document.createElement("span")
+        if (lanes[i] !== null) {
+          ch.textContent = "│"
+          ch.className = "cm-commits-line"
+          ch.style.color = getColor(i)
+        } else {
+          ch.textContent = " "
+        }
+        connGraphCol.appendChild(ch)
+      }
+
+      connector.appendChild(connGraphCol)
+      container.appendChild(connector)
+    }
   }
 
   return container
@@ -272,17 +296,40 @@ function buildDecorations(state: EditorState): DecorationSet {
   return Decoration.set(decos)
 }
 
-export const commitsField = StateField.define<DecorationSet>({
-  create(state) {
-    return buildDecorations(state)
+const commitsKeymap = keymap.of([
+  {
+    key: "Space",
+    run(view) {
+      const { state } = view
+      const pos = state.selection.main.head
+      const line = state.doc.lineAt(pos)
+      const lineText = line.text
+      COMMITS_RE.lastIndex = 0
+      if (!COMMITS_RE.test(lineText)) return false
+      if (line.to < state.doc.length) return false
+      view.dispatch({
+        changes: { from: line.to, insert: "\n " },
+        selection: EditorSelection.cursor(line.to + 2),
+      })
+      return true
+    },
   },
-  update(deco, tr) {
-    if (tr.docChanged) {
-      return buildDecorations(tr.state)
-    }
-    return deco
-  },
-  provide(field) {
-    return EditorView.decorations.from(field)
-  },
-})
+])
+
+export const commitsField: Extension = [
+  StateField.define<DecorationSet>({
+    create(state) {
+      return buildDecorations(state)
+    },
+    update(deco, tr) {
+      if (tr.docChanged) {
+        return buildDecorations(tr.state)
+      }
+      return deco
+    },
+    provide(field) {
+      return EditorView.decorations.from(field)
+    },
+  }),
+  commitsKeymap,
+]

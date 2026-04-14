@@ -400,6 +400,11 @@ export const cengoScripTheme = EditorView.baseTheme({
     opacity: "0.7",
     marginLeft: "2px",
   },
+  ".cm-commits-connector": {
+    display: "flex",
+    padding: "0 10px",
+    lineHeight: "1",
+  },
   ".cm-commits-details": {
     display: "flex",
     alignItems: "center",
