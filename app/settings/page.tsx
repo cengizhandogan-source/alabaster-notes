@@ -15,6 +15,12 @@ export default function SettingsPage() {
   const [ghConnected, setGhConnected] = useState(false)
   const [ghUsername, setGhUsername] = useState("")
   const [ghLoading, setGhLoading] = useState(true)
+
+  // Jira state
+  const [jiraConnected, setJiraConnected] = useState(false)
+  const [jiraDisplayName, setJiraDisplayName] = useState("")
+  const [jiraCloudName, setJiraCloudName] = useState("")
+  const [jiraLoading, setJiraLoading] = useState(true)
   const [enabledRepos, setEnabledRepos] = useState<GithubRepository[]>([])
   const [availableRepos, setAvailableRepos] = useState<{ id: number; full_name: string; name: string; owner: string; default_branch: string; private: boolean }[]>([])
   const [showRepoPicker, setShowRepoPicker] = useState(false)
@@ -44,6 +50,22 @@ export default function SettingsPage() {
 
   useEffect(() => { fetchGithubStatus() }, [fetchGithubStatus])
 
+  const fetchJiraStatus = useCallback(async () => {
+    try {
+      const res = await fetch("/api/jira/status")
+      const data = await res.json()
+      setJiraConnected(data.connected)
+      setJiraDisplayName(data.displayName || "")
+      setJiraCloudName(data.cloudName || "")
+    } catch {
+      // ignore
+    } finally {
+      setJiraLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { fetchJiraStatus() }, [fetchJiraStatus])
+
   // Fetch enabled repos from Supabase (via a simple client fetch is fine here)
   useEffect(() => {
     if (!ghConnected) return
@@ -71,6 +93,18 @@ export default function SettingsPage() {
     setGhConnected(false)
     setGhUsername("")
     setEnabledRepos([])
+  }
+
+  const handleConnectJira = () => {
+    window.location.href = "/api/jira/auth"
+  }
+
+  const handleDisconnectJira = async () => {
+    if (!confirm("Disconnect Jira? This will remove your Atlassian connection.")) return
+    await fetch("/api/jira/disconnect", { method: "POST" })
+    setJiraConnected(false)
+    setJiraDisplayName("")
+    setJiraCloudName("")
   }
 
   const handleShowRepoPicker = async () => {
@@ -247,6 +281,45 @@ export default function SettingsPage() {
                 className="bg-foreground text-background px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity duration-100"
               >
                 &gt; connect github
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Jira Section */}
+        <div className="border border-border p-6">
+          <h2 className="text-sm font-medium text-foreground mb-4">jira</h2>
+
+          {jiraLoading ? (
+            <p className="text-sm text-muted">checking connection...</p>
+          ) : jiraConnected ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-foreground">
+                  connected as <span className="text-accent">{jiraDisplayName}</span>
+                  <span className="text-muted ml-1">on {jiraCloudName}</span>
+                </span>
+                <button
+                  onClick={handleDisconnectJira}
+                  className="text-xs text-secondary hover:text-error transition-colors duration-100"
+                >
+                  disconnect
+                </button>
+              </div>
+              <p className="text-xs text-muted">
+                use <span className="text-accent">::jira[PROJ-123]</span> in notes to embed issue details.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <p className="text-sm text-muted mb-3">
+                connect your atlassian account to embed jira issues in notes.
+              </p>
+              <button
+                onClick={handleConnectJira}
+                className="bg-foreground text-background px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity duration-100"
+              >
+                &gt; connect jira
               </button>
             </div>
           )}

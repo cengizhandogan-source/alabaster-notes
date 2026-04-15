@@ -89,7 +89,7 @@ export function NoteListItem({
         <Link
           href={`/notes/${note.id}`}
           onClick={onClick}
-          className={`block flex-1 p-2 pr-3 border-b border-border transition-colors duration-100 hover:bg-surface ${
+          className={`block flex-1 min-w-0 p-2 pr-3 border-b border-border transition-colors duration-100 hover:bg-surface ${
             isActive
               ? "bg-surface border-l-2 border-l-accent"
               : "border-l-2 border-l-transparent"

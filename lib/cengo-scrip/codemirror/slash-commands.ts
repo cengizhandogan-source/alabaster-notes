@@ -188,6 +188,15 @@ const commands: SlashCommand[] = [
     },
   },
   {
+    pattern: "/jira",
+    handle(view, matchStart, matchEnd) {
+      view.dispatch({
+        changes: { from: matchStart, to: matchEnd, insert: "::jira[PROJ-123]" },
+        selection: { anchor: matchStart + "::jira[".length, head: matchStart + "::jira[PROJ-123".length },
+      })
+    },
+  },
+  {
     pattern: "/date",
     handle(view, matchStart, matchEnd) {
       const today = new Date().toLocaleDateString("en-US", {

@@ -118,8 +118,11 @@ class CommitsWidget extends WidgetType {
     return wrapper
   }
 
-  ignoreEvent() {
-    return true
+  ignoreEvent(e: Event) {
+    if (e.type === "mousedown" && e.target instanceof HTMLElement && e.target.closest("a")) {
+      return true
+    }
+    return false
   }
 }
 
@@ -296,23 +299,32 @@ function buildDecorations(state: EditorState): DecorationSet {
   return Decoration.set(decos)
 }
 
+function escapeCommitsWidget(view: EditorView, insertChar: string): boolean {
+  const { state } = view
+  const pos = state.selection.main.head
+  const line = state.doc.lineAt(pos)
+  COMMITS_RE.lastIndex = 0
+  if (!COMMITS_RE.test(line.text)) return false
+  if (line.to < state.doc.length) return false
+  view.dispatch({
+    changes: { from: line.to, insert: "\n" + insertChar },
+    selection: EditorSelection.cursor(line.to + 1 + insertChar.length),
+  })
+  return true
+}
+
 const commitsKeymap = keymap.of([
   {
     key: "Space",
-    run(view) {
-      const { state } = view
-      const pos = state.selection.main.head
-      const line = state.doc.lineAt(pos)
-      const lineText = line.text
-      COMMITS_RE.lastIndex = 0
-      if (!COMMITS_RE.test(lineText)) return false
-      if (line.to < state.doc.length) return false
-      view.dispatch({
-        changes: { from: line.to, insert: "\n " },
-        selection: EditorSelection.cursor(line.to + 2),
-      })
-      return true
-    },
+    run(view) { return escapeCommitsWidget(view, " ") },
+  },
+  {
+    key: "Enter",
+    run(view) { return escapeCommitsWidget(view, "") },
+  },
+  {
+    key: "ArrowDown",
+    run(view) { return escapeCommitsWidget(view, "") },
   },
 ])
 

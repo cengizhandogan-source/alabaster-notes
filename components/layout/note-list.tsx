@@ -61,7 +61,7 @@ export function NoteList({ folderTree, unfiledNotes, allFolders, activeNoteId, o
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto overflow-x-hidden">
       <SortableContext items={[...rootFolderIds, ...unfiledNoteIds]} strategy={verticalListSortingStrategy}>
         {folderTree.map((node) => (
           <FolderTreeItem

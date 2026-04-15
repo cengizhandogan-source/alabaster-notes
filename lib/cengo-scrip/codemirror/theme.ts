@@ -443,6 +443,83 @@ export const cengoScripTheme = EditorView.baseTheme({
     textAlign: "right",
   },
 
+  // Jira widget
+  ".cm-cengo-jira": {
+    color: "var(--accent)",
+    fontWeight: "500",
+  },
+  ".cm-jira-widget": {
+    borderLeft: "3px solid #2684FF",
+    margin: "4px 0 4px 8px",
+    padding: "0",
+    background: "var(--surface)",
+    borderRadius: "0 4px 4px 0",
+    fontSize: "0.85em",
+    fontFamily: "var(--font-jetbrains-mono), monospace",
+  },
+  ".cm-jira-header": {
+    fontSize: "0.75em",
+    color: "#2684FF",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    fontWeight: "600",
+    padding: "6px 10px",
+    borderBottom: "1px solid var(--border)",
+  },
+  ".cm-jira-key-link": {
+    color: "#2684FF",
+    textDecoration: "none",
+    "&:hover": {
+      textDecoration: "underline",
+    },
+  },
+  ".cm-jira-summary": {
+    color: "var(--foreground)",
+    padding: "6px 10px 4px",
+    fontSize: "1em",
+    lineHeight: "1.4",
+  },
+  ".cm-jira-meta": {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "4px 10px 8px",
+    fontSize: "0.85em",
+    color: "var(--muted)",
+    flexWrap: "wrap",
+  },
+  ".cm-jira-status": {
+    border: "1px solid var(--muted)",
+    borderRadius: "3px",
+    padding: "1px 6px",
+    fontSize: "0.85em",
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: "0.03em",
+  },
+  ".cm-jira-type": {
+    color: "var(--muted)",
+  },
+  ".cm-jira-priority": {
+    color: "var(--muted)",
+  },
+  ".cm-jira-assignee": {
+    color: "var(--muted)",
+  },
+  ".cm-jira-loading": {
+    color: "var(--muted)",
+    padding: "8px 10px",
+    fontStyle: "italic",
+  },
+  ".cm-jira-error": {
+    color: "var(--error)",
+    padding: "8px 10px",
+    fontStyle: "italic",
+  },
+  ".cm-jira-errored": {
+    borderLeftColor: "var(--error)",
+  },
+
   // Branch confirmation widget
   ".cm-branch-confirm": {
     display: "flex",

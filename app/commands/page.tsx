@@ -90,10 +90,16 @@ export default function CommandsPage() {
                     creates a GitHub branch — usage: /branch owner/repo base-branch new-branch
                   </td>
                 </tr>
-                <tr>
+                <tr className="border-b border-border">
                   <td className="px-4 py-2 text-accent">/commits</td>
                   <td className="px-4 py-2">
                     inserts a ::commits widget for viewing commit history
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-2 text-accent">/jira</td>
+                  <td className="px-4 py-2">
+                    inserts a ::jira widget for viewing Jira issue details
                   </td>
                 </tr>
               </tbody>
@@ -160,10 +166,16 @@ export default function CommandsPage() {
                     cross-note cell reference in formulas
                   </td>
                 </tr>
-                <tr>
+                <tr className="border-b border-border">
                   <td className="px-4 py-2 text-accent">::commits[owner/repo@branch]</td>
                   <td className="px-4 py-2">
                     live commit history graph with branch topology
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-2 text-accent">::jira[PROJ-123]</td>
+                  <td className="px-4 py-2">
+                    live Jira issue card with status, assignee, and priority
                   </td>
                 </tr>
               </tbody>
