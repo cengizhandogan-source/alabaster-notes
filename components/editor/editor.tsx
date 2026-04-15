@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Note, Tag, GithubRepository } from "@/lib/types"
 import { updateNote, deleteNote } from "@/actions/notes"
+import { getShare, createShare, deleteShare } from "@/actions/shares"
 import { uploadAndGetMarkdown } from "@/lib/upload"
 import { useAutoSave } from "@/hooks/use-auto-save"
 import { EditorToolbar } from "./editor-toolbar"
@@ -27,6 +28,8 @@ export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExp
   const onNavigateNote = useCallback((id: string) => router.push(`/notes/${id}`), [router])
   const [title, setTitle] = useState(note.title)
   const [content, setContent] = useState(note.content)
+  const [shareToken, setShareToken] = useState<string | null>(null)
+  const [isShared, setIsShared] = useState(false)
 
   const titleRef = useRef(title)
   const contentRef = useRef(content)
@@ -37,6 +40,14 @@ export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExp
   useEffect(() => {
     setTitle(note.title)
     setContent(note.content)
+    setShareToken(null)
+    setIsShared(false)
+    getShare(note.id).then((share) => {
+      if (share) {
+        setShareToken(share.share_token)
+        setIsShared(true)
+      }
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [note.id])
 
@@ -95,6 +106,18 @@ export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExp
     input.click()
   }
 
+  const handleShare = async () => {
+    const token = await createShare(note.id)
+    setShareToken(token)
+    setIsShared(true)
+  }
+
+  const handleUnshare = async () => {
+    await deleteShare(note.id)
+    setShareToken(null)
+    setIsShared(false)
+  }
+
   const handleDelete = async () => {
     if (confirm("delete this note?")) {
       await deleteNote(note.id)
@@ -113,6 +136,10 @@ export function Editor({ note, notes, onToggleSidebar, isSidebarCollapsed, onExp
         isSidebarCollapsed={isSidebarCollapsed}
         onExpandSidebar={onExpandSidebar}
         noteKey={note.note_key}
+        isShared={isShared}
+        shareToken={shareToken}
+        onShare={handleShare}
+        onUnshare={handleUnshare}
       />
       <MarkdownEditor content={content} onChange={handleContentChange} notes={notes} onNavigateNote={onNavigateNote} githubRepos={githubRepos} />
     </div>

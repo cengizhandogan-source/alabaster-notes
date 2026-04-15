@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+
 interface EditorToolbarProps {
   title: string
   onTitleChange: (title: string) => void
@@ -10,6 +12,10 @@ interface EditorToolbarProps {
   isSidebarCollapsed?: boolean
   onExpandSidebar?: () => void
   noteKey?: string | null
+  isShared?: boolean
+  shareToken?: string | null
+  onShare?: () => void
+  onUnshare?: () => void
 }
 
 export function EditorToolbar({
@@ -22,7 +28,21 @@ export function EditorToolbar({
   isSidebarCollapsed,
   onExpandSidebar,
   noteKey,
+  isShared,
+  shareToken,
+  onShare,
+  onUnshare,
 }: EditorToolbarProps) {
+  const [showSharePopover, setShowSharePopover] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const shareUrl = shareToken ? `${typeof window !== "undefined" ? window.location.origin : ""}/s/${shareToken}` : ""
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(shareUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
   const statusText = {
     idle: "",
     saving: "saving...",
@@ -80,6 +100,61 @@ export function EditorToolbar({
       <span className={`text-xs ${statusColor[status]} whitespace-nowrap`}>
         {statusText[status]}
       </span>
+
+      {/* Share */}
+      <div className="relative">
+        <button
+          onClick={() => setShowSharePopover(!showSharePopover)}
+          className={`text-xs transition-colors duration-100 p-1.5 ${isShared ? "text-accent hover:text-foreground" : "text-secondary hover:text-foreground"}`}
+          title={isShared ? "Manage share link" : "Share note"}
+        >
+          share
+        </button>
+        {showSharePopover && (
+          <div className="absolute right-0 top-full mt-1 bg-background border border-border p-3 z-50 min-w-[260px]">
+            {isShared && shareToken ? (
+              <div className="space-y-2">
+                <p className="text-xs text-muted">anyone with this link can view</p>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="text"
+                    readOnly
+                    value={shareUrl}
+                    className="flex-1 text-xs bg-surface border border-border px-2 py-1 text-foreground font-mono"
+                  />
+                  <button
+                    onClick={handleCopy}
+                    className="text-xs text-secondary hover:text-foreground transition-colors duration-100 px-2 py-1 border border-border"
+                  >
+                    {copied ? "copied" : "copy"}
+                  </button>
+                </div>
+                <button
+                  onClick={() => {
+                    onUnshare?.()
+                    setShowSharePopover(false)
+                  }}
+                  className="text-xs text-error hover:text-foreground transition-colors duration-100"
+                >
+                  unshare
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs text-muted">create a public read-only link</p>
+                <button
+                  onClick={() => {
+                    onShare?.()
+                  }}
+                  className="text-xs text-secondary hover:text-foreground transition-colors duration-100 border border-border px-2 py-1"
+                >
+                  create share link
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Attach file */}
       {onUploadFile && (
