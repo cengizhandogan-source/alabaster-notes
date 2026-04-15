@@ -1,5 +1,6 @@
 import { EditorView, ViewPlugin, ViewUpdate, Decoration } from "@codemirror/view"
 import { RangeSetBuilder } from "@codemirror/state"
+import { readOnlyFacet } from "../facets"
 
 const BOLD_RE = /\*\*(?!\s)(.+?)(?<!\s)\*\*/g
 const ITALIC_RE = /(?<!\*)\*(?!\*|\s)(.+?)(?<!\s|\*)\*(?!\*)/g
@@ -12,6 +13,7 @@ interface MarkerRange {
 }
 
 function buildDecorations(view: EditorView) {
+  const isReadOnly = view.state.facet(readOnlyFacet)
   const cursor = view.state.selection.main
   const markers: MarkerRange[] = []
 
@@ -24,7 +26,7 @@ function buildDecorations(view: EditorView) {
     while ((match = BOLD_RE.exec(text)) !== null) {
       const matchFrom = from + match.index
       const matchTo = matchFrom + match[0].length
-      if (cursor.from <= matchTo && cursor.to >= matchFrom) continue
+      if (!isReadOnly && cursor.from <= matchTo && cursor.to >= matchFrom) continue
       markers.push({ from: matchFrom, to: matchFrom + 2 })
       markers.push({ from: matchTo - 2, to: matchTo })
     }
@@ -34,7 +36,7 @@ function buildDecorations(view: EditorView) {
     while ((match = ITALIC_RE.exec(text)) !== null) {
       const matchFrom = from + match.index
       const matchTo = matchFrom + match[0].length
-      if (cursor.from <= matchTo && cursor.to >= matchFrom) continue
+      if (!isReadOnly && cursor.from <= matchTo && cursor.to >= matchFrom) continue
       // Skip if this * is part of a ** bold marker already handled
       const openChar = text[match.index - 1]
       const closeChar = text[match.index + match[0].length]
@@ -48,7 +50,7 @@ function buildDecorations(view: EditorView) {
     while ((match = STRIKE_RE.exec(text)) !== null) {
       const matchFrom = from + match.index
       const matchTo = matchFrom + match[0].length
-      if (cursor.from <= matchTo && cursor.to >= matchFrom) continue
+      if (!isReadOnly && cursor.from <= matchTo && cursor.to >= matchFrom) continue
       markers.push({ from: matchFrom, to: matchFrom + 2 })
       markers.push({ from: matchTo - 2, to: matchTo })
     }
@@ -60,7 +62,7 @@ function buildDecorations(view: EditorView) {
       const matchTo = matchFrom + match[0].length
       const line = view.state.doc.lineAt(matchFrom)
       const cursorLine = view.state.doc.lineAt(cursor.from)
-      if (line.number === cursorLine.number) continue
+      if (!isReadOnly && line.number === cursorLine.number) continue
       markers.push({ from: matchFrom, to: matchTo })
     }
   }
