@@ -1,5 +1,6 @@
 import { EditorView, Decoration, WidgetType, DecorationSet } from "@codemirror/view"
 import { EditorState, StateField, StateEffect, Range, Facet } from "@codemirror/state"
+import { readOnlyFacet } from "../facets"
 import { parseSheets, gridToCells, cellsToGrid } from "../spreadsheet/parser"
 import { colToLetter, type SheetData } from "../spreadsheet/types"
 import { evaluateCell } from "../spreadsheet/engine"
@@ -50,6 +51,7 @@ class SheetWidget extends WidgetType {
   }
 
   toDOM(view: EditorView) {
+    const ro = view.state.facet(readOnlyFacet)
     const wrapper = document.createElement("div")
     wrapper.className = "cm-sheet-widget"
 
@@ -61,36 +63,40 @@ class SheetWidget extends WidgetType {
     nameLabel.textContent = this.name
     header.appendChild(nameLabel)
 
-    const controls = document.createElement("span")
-    controls.className = "cm-sheet-controls"
+    if (!ro) {
+      const controls = document.createElement("span")
+      controls.className = "cm-sheet-controls"
 
-    const addColBtn = document.createElement("button")
-    addColBtn.className = "cm-sheet-add-btn"
-    addColBtn.textContent = "+ Col"
-    addColBtn.title = "Add column"
-    controls.appendChild(addColBtn)
+      const addColBtn = document.createElement("button")
+      addColBtn.className = "cm-sheet-add-btn"
+      addColBtn.textContent = "+ Col"
+      addColBtn.title = "Add column"
+      controls.appendChild(addColBtn)
 
-    const addRowBtn = document.createElement("button")
-    addRowBtn.className = "cm-sheet-add-btn"
-    addRowBtn.textContent = "+ Row"
-    addRowBtn.title = "Add row"
-    controls.appendChild(addRowBtn)
+      const addRowBtn = document.createElement("button")
+      addRowBtn.className = "cm-sheet-add-btn"
+      addRowBtn.textContent = "+ Row"
+      addRowBtn.title = "Add row"
+      controls.appendChild(addRowBtn)
 
-    header.appendChild(controls)
+      header.appendChild(controls)
+    }
     wrapper.appendChild(header)
 
-    // Formula bar
-    const formulaBar = document.createElement("div")
-    formulaBar.className = "cm-sheet-formula-bar"
+    // Formula bar (hide in read-only)
     const cellLabel = document.createElement("span")
-    cellLabel.className = "cm-sheet-cell-label"
-    cellLabel.textContent = "A1"
-    formulaBar.appendChild(cellLabel)
     const formulaInput = document.createElement("span")
-    formulaInput.className = "cm-sheet-formula-input"
-    formulaInput.textContent = ""
-    formulaBar.appendChild(formulaInput)
-    wrapper.appendChild(formulaBar)
+    if (!ro) {
+      const formulaBar = document.createElement("div")
+      formulaBar.className = "cm-sheet-formula-bar"
+      cellLabel.className = "cm-sheet-cell-label"
+      cellLabel.textContent = "A1"
+      formulaBar.appendChild(cellLabel)
+      formulaInput.className = "cm-sheet-formula-input"
+      formulaInput.textContent = ""
+      formulaBar.appendChild(formulaInput)
+      wrapper.appendChild(formulaBar)
+    }
 
     // Build the grid table
     const table = document.createElement("table")
@@ -153,7 +159,6 @@ class SheetWidget extends WidgetType {
 
       for (let c = 0; c < currentCols; c++) {
         const td = document.createElement("td")
-        td.contentEditable = "true"
         td.dataset.row = String(r)
         td.dataset.col = String(c)
         const addr = colToLetter(c) + (r + 1)
@@ -162,34 +167,37 @@ class SheetWidget extends WidgetType {
         td.textContent = computed[addr] ?? raw
         td.dataset.raw = raw
 
-        td.addEventListener("focus", () => {
-          td.textContent = td.dataset.raw || ""
-          cellLabel.textContent = addr
-          formulaInput.textContent = td.dataset.raw || ""
-          td.classList.add("cm-sheet-cell-active")
-        })
+        if (!ro) {
+          td.contentEditable = "true"
+          td.addEventListener("focus", () => {
+            td.textContent = td.dataset.raw || ""
+            cellLabel.textContent = addr
+            formulaInput.textContent = td.dataset.raw || ""
+            td.classList.add("cm-sheet-cell-active")
+          })
 
-        td.addEventListener("blur", () => {
-          const newRaw = td.textContent?.trim() ?? ""
-          td.dataset.raw = newRaw
-          // Recompute this cell
-          const updatedCells = readCells()
-          if (newRaw.startsWith("=")) {
-            try {
-              const result = evaluateCell(addr, updatedCells)
-              td.textContent = typeof result === "number" ? (Number.isInteger(result) ? String(result) : result.toFixed(4).replace(/\.?0+$/, "")) : String(result)
-            } catch {
-              td.textContent = "#ERR!"
+          td.addEventListener("blur", () => {
+            const newRaw = td.textContent?.trim() ?? ""
+            td.dataset.raw = newRaw
+            // Recompute this cell
+            const updatedCells = readCells()
+            if (newRaw.startsWith("=")) {
+              try {
+                const result = evaluateCell(addr, updatedCells)
+                td.textContent = typeof result === "number" ? (Number.isInteger(result) ? String(result) : result.toFixed(4).replace(/\.?0+$/, "")) : String(result)
+              } catch {
+                td.textContent = "#ERR!"
+              }
+            } else {
+              td.textContent = newRaw
             }
-          } else {
-            td.textContent = newRaw
-          }
-          td.classList.remove("cm-sheet-cell-active")
-        })
+            td.classList.remove("cm-sheet-cell-active")
+          })
 
-        td.addEventListener("input", () => {
-          formulaInput.textContent = td.textContent || ""
-        })
+          td.addEventListener("input", () => {
+            formulaInput.textContent = td.textContent || ""
+          })
+        }
 
         tr.appendChild(td)
       }
@@ -197,6 +205,8 @@ class SheetWidget extends WidgetType {
     }
     table.appendChild(tbody)
     wrapper.appendChild(table)
+
+    if (ro) return wrapper
 
     const sheetFrom = this.sheetFrom
     const sheetTo = this.sheetTo
@@ -252,6 +262,9 @@ class SheetWidget extends WidgetType {
     }
 
     // Add column
+    const addColBtn = header.querySelector(".cm-sheet-add-btn") as HTMLElement
+    const addRowBtn = header.querySelectorAll(".cm-sheet-add-btn")[1] as HTMLElement
+
     addColBtn.addEventListener("click", (e) => {
       e.preventDefault()
       currentCols++

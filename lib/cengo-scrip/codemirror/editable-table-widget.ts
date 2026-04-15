@@ -1,5 +1,6 @@
 import { EditorView, Decoration, WidgetType, DecorationSet } from "@codemirror/view"
 import { EditorState, StateField, StateEffect, Range } from "@codemirror/state"
+import { readOnlyFacet } from "../facets"
 
 const tableSyncEffect = StateEffect.define<null>()
 
@@ -91,6 +92,7 @@ class EditableTableWidget extends WidgetType {
   }
 
   toDOM(view: EditorView) {
+    const ro = view.state.facet(readOnlyFacet)
     const wrapper = document.createElement("div")
     wrapper.className = "cm-table-edit-widget"
 
@@ -101,7 +103,7 @@ class EditableTableWidget extends WidgetType {
     const headerRow = document.createElement("tr")
     for (const h of this.headers) {
       const th = document.createElement("th")
-      th.contentEditable = "true"
+      if (!ro) th.contentEditable = "true"
       th.textContent = h
       headerRow.appendChild(th)
     }
@@ -114,7 +116,7 @@ class EditableTableWidget extends WidgetType {
       const tr = document.createElement("tr")
       for (let ci = 0; ci < this.headers.length; ci++) {
         const td = document.createElement("td")
-        td.contentEditable = "true"
+        if (!ro) td.contentEditable = "true"
         td.textContent = row[ci] || ""
         tr.appendChild(td)
       }
@@ -123,6 +125,8 @@ class EditableTableWidget extends WidgetType {
     table.appendChild(tbody)
 
     wrapper.appendChild(table)
+
+    if (ro) return wrapper
 
     // Capture from/to at widget creation time
     const tableFrom = this.tableFrom

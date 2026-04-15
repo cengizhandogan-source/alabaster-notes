@@ -21,18 +21,44 @@ import { plotField } from "./codemirror/plot-widget"
 import { commitsField } from "./codemirror/commits-widget"
 import type { Extension } from "@codemirror/state"
 import type { NoteRef } from "./utils/slugify"
+import { readOnlyFacet } from "./facets"
+
+export { readOnlyFacet }
 
 interface CengoScripOptions {
   notes?: NoteRef[]
   onNavigate?: (noteId: string) => void
   repos?: RepoRef[]
+  readOnly?: boolean
 }
 
 export function cengoScripExtension(options: CengoScripOptions = {}): Extension {
-  const extensions: Extension[] = [highlightPlugin, tableExpand, slashCommands, branchConfirmField, mathPreviewPlugin, tablePreviewPlugin, editableTableField, aiPreviewField, inlineFormatPlugin, checkboxPlugin, fileDropExtension, imagePreviewPlugin, urlLinkPlugin, hrPlugin, sheetField, plotField, commitsField, cengoScripTheme]
+  const ro = options.readOnly ?? false
+
+  const extensions: Extension[] = [
+    readOnlyFacet.of(ro),
+    highlightPlugin,
+    mathPreviewPlugin,
+    tablePreviewPlugin,
+    editableTableField,
+    inlineFormatPlugin,
+    checkboxPlugin,
+    imagePreviewPlugin,
+    urlLinkPlugin,
+    hrPlugin,
+    sheetField,
+    plotField,
+    commitsField,
+    cengoScripTheme,
+  ]
+
+  if (!ro) {
+    extensions.push(tableExpand, slashCommands, branchConfirmField, aiPreviewField, fileDropExtension)
+  }
 
   if (options.notes) {
-    extensions.push(notesListFacet.of(options.notes), noteLinkPlugin, noteAutocompletion)
+    extensions.push(notesListFacet.of(options.notes), noteLinkPlugin)
+    if (!ro) extensions.push(noteAutocompletion)
   }
   if (options.onNavigate) {
     extensions.push(noteNavigateFacet.of(options.onNavigate))

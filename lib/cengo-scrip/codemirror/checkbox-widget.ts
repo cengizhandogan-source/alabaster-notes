@@ -1,5 +1,6 @@
 import { EditorView, ViewPlugin, ViewUpdate, Decoration, WidgetType } from "@codemirror/view"
 import { RangeSetBuilder } from "@codemirror/state"
+import { readOnlyFacet } from "../facets"
 
 const CHECKBOX_RE = /- \[([ x])\]/g
 
@@ -20,16 +21,21 @@ class CheckboxWidget extends WidgetType {
     input.type = "checkbox"
     input.checked = this.checked
     input.className = "cm-checkbox-widget"
-    input.addEventListener("mousedown", (e) => {
-      e.preventDefault()
-      view.dispatch({
-        changes: {
-          from: this.charPos,
-          to: this.charPos + 1,
-          insert: this.checked ? " " : "x",
-        },
+    const ro = view.state.facet(readOnlyFacet)
+    if (ro) {
+      input.disabled = true
+    } else {
+      input.addEventListener("mousedown", (e) => {
+        e.preventDefault()
+        view.dispatch({
+          changes: {
+            from: this.charPos,
+            to: this.charPos + 1,
+            insert: this.checked ? " " : "x",
+          },
+        })
       })
-    })
+    }
     return input
   }
 
@@ -40,6 +46,7 @@ class CheckboxWidget extends WidgetType {
 
 function buildDecorations(view: EditorView) {
   const builder = new RangeSetBuilder<Decoration>()
+  const ro = view.state.facet(readOnlyFacet)
   const cursor = view.state.selection.main
   const cursorLine = view.state.doc.lineAt(cursor.head).number
 
@@ -53,8 +60,8 @@ function buildDecorations(view: EditorView) {
       const matchTo = matchFrom + match[0].length
       const matchLine = view.state.doc.lineAt(matchFrom).number
 
-      // Show raw text when cursor is on the same line
-      if (matchLine === cursorLine) continue
+      // Show raw text when cursor is on the same line (skip in read-only)
+      if (!ro && matchLine === cursorLine) continue
 
       const checked = match[1] === "x"
       // charPos points to the space or 'x' between the brackets

@@ -43,6 +43,14 @@ export type FolderTag = {
   tag_id: string
 }
 
+export type NoteShare = {
+  id: string
+  note_id: string
+  user_id: string
+  share_token: string
+  created_at: string
+}
+
 export type GithubConnection = {
   id: string
   user_id: string
