@@ -20,6 +20,8 @@ import { sheetField } from "./codemirror/sheet-widget"
 import { plotField } from "./codemirror/plot-widget"
 import { commitsField } from "./codemirror/commits-widget"
 import { jiraField } from "./codemirror/jira-widget"
+import { todoistField } from "./codemirror/todoist-widget"
+import { todoistTodayField } from "./codemirror/todoist-today-widget"
 import type { Extension } from "@codemirror/state"
 import type { NoteRef } from "./utils/slugify"
 import { readOnlyFacet } from "./facets"
@@ -51,6 +53,8 @@ export function cengoScripExtension(options: CengoScripOptions = {}): Extension 
     plotField,
     commitsField,
     jiraField,
+    todoistField,
+    todoistTodayField,
     cengoScripTheme,
   ]
 

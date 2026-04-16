@@ -197,6 +197,23 @@ const commands: SlashCommand[] = [
     },
   },
   {
+    pattern: "/todoist-today",
+    handle(view, matchStart, matchEnd) {
+      view.dispatch({
+        changes: { from: matchStart, to: matchEnd, insert: "::todoist-today[]" },
+      })
+    },
+  },
+  {
+    pattern: "/todoist",
+    handle(view, matchStart, matchEnd) {
+      view.dispatch({
+        changes: { from: matchStart, to: matchEnd, insert: "::todoist[task-id]" },
+        selection: { anchor: matchStart + "::todoist[".length, head: matchStart + "::todoist[task-id".length },
+      })
+    },
+  },
+  {
     pattern: "/date",
     handle(view, matchStart, matchEnd) {
       const today = new Date().toLocaleDateString("en-US", {

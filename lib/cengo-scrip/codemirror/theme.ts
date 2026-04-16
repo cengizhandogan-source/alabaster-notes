@@ -520,6 +520,164 @@ export const cengoScripTheme = EditorView.baseTheme({
     borderLeftColor: "var(--error)",
   },
 
+  // Todoist widget
+  ".cm-todoist-widget": {
+    borderLeft: "3px solid #E44332",
+    margin: "4px 0 4px 8px",
+    padding: "0",
+    background: "var(--surface)",
+    borderRadius: "0 4px 4px 0",
+    fontSize: "0.85em",
+    fontFamily: "var(--font-jetbrains-mono), monospace",
+  },
+  ".cm-todoist-header": {
+    fontSize: "0.75em",
+    color: "#E44332",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    fontWeight: "600",
+    padding: "6px 10px",
+    borderBottom: "1px solid var(--border)",
+  },
+  ".cm-todoist-key-link": {
+    color: "#E44332",
+    textDecoration: "none",
+    "&:hover": {
+      textDecoration: "underline",
+    },
+  },
+  ".cm-todoist-content": {
+    color: "var(--foreground)",
+    padding: "6px 10px 4px",
+    fontSize: "1em",
+    lineHeight: "1.4",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+  ".cm-todoist-checkbox": {
+    accentColor: "#E44332",
+    cursor: "pointer",
+    width: "14px",
+    height: "14px",
+    flexShrink: "0",
+  },
+  ".cm-todoist-completed": {
+    textDecoration: "line-through",
+    opacity: "0.5",
+  },
+  ".cm-todoist-meta": {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "4px 10px 8px",
+    fontSize: "0.85em",
+    color: "var(--muted)",
+    flexWrap: "wrap",
+  },
+  ".cm-todoist-priority": {
+    border: "1px solid var(--muted)",
+    borderRadius: "3px",
+    padding: "1px 6px",
+    fontSize: "0.85em",
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: "0.03em",
+  },
+  ".cm-todoist-due": {
+    color: "var(--muted)",
+  },
+  ".cm-todoist-label": {
+    color: "var(--accent)",
+    fontSize: "0.85em",
+  },
+  ".cm-todoist-loading": {
+    color: "var(--muted)",
+    padding: "8px 10px",
+    fontStyle: "italic",
+  },
+  ".cm-todoist-error": {
+    color: "var(--error)",
+    padding: "8px 10px",
+    fontStyle: "italic",
+  },
+  ".cm-todoist-errored": {
+    borderLeftColor: "var(--error)",
+  },
+
+  // Todoist Today widget
+  ".cm-todoist-today-widget": {
+    borderLeft: "3px solid #E44332",
+    margin: "4px 0 4px 8px",
+    padding: "0",
+    background: "var(--surface)",
+    borderRadius: "0 4px 4px 0",
+    fontSize: "0.85em",
+    fontFamily: "var(--font-jetbrains-mono), monospace",
+  },
+  ".cm-todoist-today-header": {
+    fontSize: "0.75em",
+    color: "#E44332",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    fontWeight: "600",
+    padding: "6px 10px",
+    borderBottom: "1px solid var(--border)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  ".cm-todoist-today-refresh": {
+    color: "var(--muted)",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "1em",
+    fontFamily: "inherit",
+    padding: "0",
+    "&:hover": {
+      color: "var(--foreground)",
+    },
+  },
+  ".cm-todoist-today-body": {
+    padding: "4px 0",
+  },
+  ".cm-todoist-today-row": {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "4px 10px",
+    transition: "opacity 0.15s",
+  },
+  ".cm-todoist-today-content": {
+    color: "var(--foreground)",
+    flex: "1",
+  },
+  ".cm-todoist-today-priority": {
+    fontSize: "0.7em",
+    flexShrink: "0",
+  },
+  ".cm-todoist-today-time": {
+    color: "var(--muted)",
+    fontSize: "0.85em",
+    flexShrink: "0",
+  },
+  ".cm-todoist-today-empty": {
+    color: "var(--muted)",
+    padding: "8px 10px",
+    fontStyle: "italic",
+  },
+
+  // Syntax highlight marks
+  ".cm-cengo-todoist": {
+    color: "#E44332",
+    fontWeight: "500",
+  },
+  ".cm-cengo-todoist-today": {
+    color: "#E44332",
+    fontWeight: "500",
+  },
+
   // Branch confirmation widget
   ".cm-branch-confirm": {
     display: "flex",

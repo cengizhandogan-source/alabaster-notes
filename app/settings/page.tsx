@@ -21,6 +21,11 @@ export default function SettingsPage() {
   const [jiraDisplayName, setJiraDisplayName] = useState("")
   const [jiraCloudName, setJiraCloudName] = useState("")
   const [jiraLoading, setJiraLoading] = useState(true)
+
+  // Todoist state
+  const [todoistConnected, setTodoistConnected] = useState(false)
+  const [todoistDisplayName, setTodoistDisplayName] = useState("")
+  const [todoistLoading, setTodoistLoading] = useState(true)
   const [enabledRepos, setEnabledRepos] = useState<GithubRepository[]>([])
   const [availableRepos, setAvailableRepos] = useState<{ id: number; full_name: string; name: string; owner: string; default_branch: string; private: boolean }[]>([])
   const [showRepoPicker, setShowRepoPicker] = useState(false)
@@ -66,6 +71,21 @@ export default function SettingsPage() {
 
   useEffect(() => { fetchJiraStatus() }, [fetchJiraStatus])
 
+  const fetchTodoistStatus = useCallback(async () => {
+    try {
+      const res = await fetch("/api/todoist/status")
+      const data = await res.json()
+      setTodoistConnected(data.connected)
+      setTodoistDisplayName(data.displayName || "")
+    } catch {
+      // ignore
+    } finally {
+      setTodoistLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { fetchTodoistStatus() }, [fetchTodoistStatus])
+
   // Fetch enabled repos from Supabase (via a simple client fetch is fine here)
   useEffect(() => {
     if (!ghConnected) return
@@ -105,6 +125,17 @@ export default function SettingsPage() {
     setJiraConnected(false)
     setJiraDisplayName("")
     setJiraCloudName("")
+  }
+
+  const handleConnectTodoist = () => {
+    window.location.href = "/api/todoist/auth"
+  }
+
+  const handleDisconnectTodoist = async () => {
+    if (!confirm("Disconnect Todoist? This will remove your Todoist connection.")) return
+    await fetch("/api/todoist/disconnect", { method: "POST" })
+    setTodoistConnected(false)
+    setTodoistDisplayName("")
   }
 
   const handleShowRepoPicker = async () => {
@@ -320,6 +351,45 @@ export default function SettingsPage() {
                 className="bg-foreground text-background px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity duration-100"
               >
                 &gt; connect jira
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Todoist Section */}
+        <div className="border border-border p-6">
+          <h2 className="text-sm font-medium text-foreground mb-4">todoist</h2>
+
+          {todoistLoading ? (
+            <p className="text-sm text-muted">checking connection...</p>
+          ) : todoistConnected ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-foreground">
+                  connected as <span className="text-accent">{todoistDisplayName}</span>
+                </span>
+                <button
+                  onClick={handleDisconnectTodoist}
+                  className="text-xs text-secondary hover:text-error transition-colors duration-100"
+                >
+                  disconnect
+                </button>
+              </div>
+              <div className="text-xs text-muted space-y-1">
+                <p>use <span className="text-accent">::todoist[task-id]</span> in notes to embed a task.</p>
+                <p>use <span className="text-accent">::todoist-today[]</span> to show today&apos;s tasks.</p>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className="text-sm text-muted mb-3">
+                connect your todoist account to embed and manage tasks in notes.
+              </p>
+              <button
+                onClick={handleConnectTodoist}
+                className="bg-foreground text-background px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity duration-100"
+              >
+                &gt; connect todoist
               </button>
             </div>
           )}

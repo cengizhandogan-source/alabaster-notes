@@ -41,6 +41,16 @@ const jiraDecorator = new MatchDecorator({
   decoration: Decoration.mark({ class: "cm-cengo-jira" }),
 })
 
+const todoistDecorator = new MatchDecorator({
+  regexp: /^::todoist\[\d+\]\s*$/gm,
+  decoration: Decoration.mark({ class: "cm-cengo-todoist" }),
+})
+
+const todoistTodayDecorator = new MatchDecorator({
+  regexp: /^::todoist-today\[\]\s*$/gm,
+  decoration: Decoration.mark({ class: "cm-cengo-todoist-today" }),
+})
+
 export const highlightPlugin = ViewPlugin.fromClass(
   class {
     aiDeco: DecorationSet
@@ -52,6 +62,8 @@ export const highlightPlugin = ViewPlugin.fromClass(
     plotDeco: DecorationSet
     commitsDeco: DecorationSet
     jiraDeco: DecorationSet
+    todoistDeco: DecorationSet
+    todoistTodayDeco: DecorationSet
 
     constructor(view: import("@codemirror/view").EditorView) {
       this.aiDeco = aiDecorator.createDeco(view)
@@ -62,6 +74,8 @@ export const highlightPlugin = ViewPlugin.fromClass(
       this.plotDeco = plotDecorator.createDeco(view)
       this.commitsDeco = commitsDecorator.createDeco(view)
       this.jiraDeco = jiraDecorator.createDeco(view)
+      this.todoistDeco = todoistDecorator.createDeco(view)
+      this.todoistTodayDeco = todoistTodayDecorator.createDeco(view)
     }
 
     update(update: ViewUpdate) {
@@ -73,9 +87,11 @@ export const highlightPlugin = ViewPlugin.fromClass(
       this.plotDeco = plotDecorator.updateDeco(update, this.plotDeco)
       this.commitsDeco = commitsDecorator.updateDeco(update, this.commitsDeco)
       this.jiraDeco = jiraDecorator.updateDeco(update, this.jiraDeco)
+      this.todoistDeco = todoistDecorator.updateDeco(update, this.todoistDeco)
+      this.todoistTodayDeco = todoistTodayDecorator.updateDeco(update, this.todoistTodayDeco)
     }
   },
   {
-    decorations: (v) => RangeSet.join([v.aiDeco, v.tableDeco, v.mathDeco, v.noteLinkDeco, v.sheetDeco, v.plotDeco, v.commitsDeco, v.jiraDeco]),
+    decorations: (v) => RangeSet.join([v.aiDeco, v.tableDeco, v.mathDeco, v.noteLinkDeco, v.sheetDeco, v.plotDeco, v.commitsDeco, v.jiraDeco, v.todoistDeco, v.todoistTodayDeco]),
   }
 )
