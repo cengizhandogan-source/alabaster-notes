@@ -1,6 +1,16 @@
 import { createClient } from "@/lib/supabase/server"
-import { getConnectUrl, getOrCreateZernioProfileId } from "@/lib/zernio/client"
+import {
+  deleteLocalZernioProfile,
+  getConnectUrl,
+  getOrCreateZernioProfileId,
+} from "@/lib/zernio/client"
 import { redirect } from "next/navigation"
+
+function isProfileNotFound(err: unknown): boolean {
+  if (!(err instanceof Error)) return false
+  const m = err.message
+  return m.includes("404") && m.toLowerCase().includes("profile not found")
+}
 
 export async function GET() {
   const supabase = await createClient()
@@ -12,13 +22,25 @@ export async function GET() {
     })
   }
 
+  const profileName = user.email || `alabaster-${user.id.slice(0, 8)}`
+
   let authUrl: string
   try {
-    const profileName = user.email || `alabaster-${user.id.slice(0, 8)}`
-    const profileId = await getOrCreateZernioProfileId(user.id, profileName)
-    const res = await getConnectUrl("instagram", profileId)
-    if (!res?.authUrl) throw new Error("Zernio did not return an authUrl")
-    authUrl = res.authUrl
+    let profileId = await getOrCreateZernioProfileId(user.id, profileName)
+    try {
+      const res = await getConnectUrl("instagram", profileId)
+      if (!res?.authUrl) throw new Error("Zernio did not return an authUrl")
+      authUrl = res.authUrl
+    } catch (err) {
+      // Local mapping points at a profile that no longer exists on Zernio
+      // (e.g. API key rotation or manual cleanup). Recreate and retry once.
+      if (!isProfileNotFound(err)) throw err
+      await deleteLocalZernioProfile(user.id)
+      profileId = await getOrCreateZernioProfileId(user.id, profileName)
+      const res = await getConnectUrl("instagram", profileId)
+      if (!res?.authUrl) throw new Error("Zernio did not return an authUrl")
+      authUrl = res.authUrl
+    }
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to start Instagram connect flow"
     return new Response(connectPageHtml(message), {
