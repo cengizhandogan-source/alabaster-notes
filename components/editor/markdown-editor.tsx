@@ -11,6 +11,7 @@ import { searchKeymap } from "@codemirror/search"
 import { cengoScripExtension } from "@/lib/cengo-scrip"
 import type { NoteRef } from "@/lib/cengo-scrip/utils/slugify"
 import type { GithubRepository } from "@/lib/types"
+import { InstagramPostModal } from "@/components/instagram-post-modal"
 
 const markdownHighlight = syntaxHighlighting(
   HighlightStyle.define([
@@ -132,5 +133,10 @@ export function MarkdownEditor({ content, onChange, notes, onNavigateNote, githu
     }
   }, [content])
 
-  return <div ref={editorRef} className="flex-1 overflow-auto" />
+  return (
+    <>
+      <div ref={editorRef} className="flex-1 overflow-auto" />
+      <InstagramPostModal />
+    </>
+  )
 }

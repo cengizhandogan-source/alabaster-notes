@@ -22,6 +22,7 @@ import { commitsField } from "./codemirror/commits-widget"
 import { jiraField } from "./codemirror/jira-widget"
 import { todoistField } from "./codemirror/todoist-widget"
 import { todoistTodayField } from "./codemirror/todoist-today-widget"
+import { instagramField } from "./codemirror/instagram-widget"
 import type { Extension } from "@codemirror/state"
 import type { NoteRef } from "./utils/slugify"
 import { readOnlyFacet } from "./facets"
@@ -55,6 +56,7 @@ export function cengoScripExtension(options: CengoScripOptions = {}): Extension 
     jiraField,
     todoistField,
     todoistTodayField,
+    instagramField,
     cengoScripTheme,
   ]
 

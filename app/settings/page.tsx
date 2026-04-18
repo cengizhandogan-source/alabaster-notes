@@ -1,9 +1,17 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { addRepository, removeRepository } from "@/actions/github"
 import type { GithubRepository } from "@/lib/types"
+
+type InstagramAccount = {
+  id: string
+  username: string
+  displayName: string
+  profileImage: string | null
+  healthStatus: string
+}
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -26,6 +34,14 @@ export default function SettingsPage() {
   const [todoistConnected, setTodoistConnected] = useState(false)
   const [todoistDisplayName, setTodoistDisplayName] = useState("")
   const [todoistLoading, setTodoistLoading] = useState(true)
+
+  // Instagram (via Zernio) state
+  const [igAccounts, setIgAccounts] = useState<InstagramAccount[]>([])
+  const [igLoading, setIgLoading] = useState(true)
+  const [igConnecting, setIgConnecting] = useState(false)
+  const [igError, setIgError] = useState<string | null>(null)
+  const igPopupRef = useRef<Window | null>(null)
+  const igPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const [enabledRepos, setEnabledRepos] = useState<GithubRepository[]>([])
   const [availableRepos, setAvailableRepos] = useState<{ id: number; full_name: string; name: string; owner: string; default_branch: string; private: boolean }[]>([])
   const [showRepoPicker, setShowRepoPicker] = useState(false)
@@ -86,6 +102,26 @@ export default function SettingsPage() {
 
   useEffect(() => { fetchTodoistStatus() }, [fetchTodoistStatus])
 
+  const fetchInstagramStatus = useCallback(async () => {
+    try {
+      const res = await fetch("/api/zernio/status")
+      const data = await res.json()
+      setIgAccounts(data.accounts || [])
+    } catch {
+      // ignore
+    } finally {
+      setIgLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { fetchInstagramStatus() }, [fetchInstagramStatus])
+
+  useEffect(() => {
+    return () => {
+      if (igPollRef.current) clearInterval(igPollRef.current)
+    }
+  }, [])
+
   // Fetch enabled repos from Supabase (via a simple client fetch is fine here)
   useEffect(() => {
     if (!ghConnected) return
@@ -136,6 +172,63 @@ export default function SettingsPage() {
     await fetch("/api/todoist/disconnect", { method: "POST" })
     setTodoistConnected(false)
     setTodoistDisplayName("")
+  }
+
+  const stopIgPolling = useCallback(() => {
+    if (igPollRef.current) {
+      clearInterval(igPollRef.current)
+      igPollRef.current = null
+    }
+    setIgConnecting(false)
+  }, [])
+
+  const handleConnectInstagram = useCallback(() => {
+    setIgError(null)
+    setIgConnecting(true)
+
+    const known = new Set(igAccounts.map((a) => a.id))
+
+    const popup = window.open(
+      "/api/zernio/connect/instagram",
+      "zernio-connect",
+      "width=600,height=720,menubar=no,toolbar=no,location=no",
+    )
+    if (!popup) {
+      setIgError("popup blocked. allow popups for this site and try again.")
+      setIgConnecting(false)
+      return
+    }
+    igPopupRef.current = popup
+
+    if (igPollRef.current) clearInterval(igPollRef.current)
+    igPollRef.current = setInterval(async () => {
+      try {
+        const res = await fetch("/api/zernio/accounts")
+        if (res.ok) {
+          const data = await res.json()
+          const accounts = (data.accounts || []) as InstagramAccount[]
+          const newAccount = accounts.find((a) => !known.has(a.id))
+          if (newAccount) {
+            setIgAccounts(accounts)
+            stopIgPolling()
+            igPopupRef.current?.close()
+            return
+          }
+        }
+      } catch {
+        // keep polling
+      }
+
+      if (igPopupRef.current?.closed) {
+        stopIgPolling()
+      }
+    }, 2000)
+  }, [igAccounts, stopIgPolling])
+
+  const handleDisconnectInstagram = async () => {
+    if (!confirm("Disconnect Instagram? This removes the zernio profile and all connected accounts.")) return
+    await fetch("/api/zernio/disconnect", { method: "POST" })
+    setIgAccounts([])
   }
 
   const handleShowRepoPicker = async () => {
@@ -352,6 +445,71 @@ export default function SettingsPage() {
               >
                 &gt; connect jira
               </button>
+            </div>
+          )}
+        </div>
+
+        {/* Instagram (via Zernio) Section */}
+        <div className="border border-border p-6">
+          <h2 className="text-sm font-medium text-foreground mb-4">instagram</h2>
+
+          {igLoading ? (
+            <p className="text-sm text-muted">checking connection...</p>
+          ) : igAccounts.length > 0 ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-foreground">
+                  connected via <span className="text-accent">zernio</span>
+                </span>
+                <button
+                  onClick={handleDisconnectInstagram}
+                  className="text-xs text-secondary hover:text-error transition-colors duration-100"
+                >
+                  disconnect
+                </button>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-secondary">accounts</span>
+                  <button
+                    onClick={handleConnectInstagram}
+                    disabled={igConnecting}
+                    className="text-xs text-secondary hover:text-foreground transition-colors duration-100 disabled:opacity-50"
+                  >
+                    {igConnecting ? "waiting for authorization..." : "+ add another"}
+                  </button>
+                </div>
+                <div className="space-y-1">
+                  {igAccounts.map((a) => (
+                    <div key={a.id} className="flex items-center justify-between py-1.5 px-2 border border-border">
+                      <span className="text-sm text-foreground truncate">
+                        @{a.username}
+                        {a.healthStatus !== "connected" && (
+                          <span className="text-xs text-error ml-2">({a.healthStatus})</span>
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p className="text-xs text-muted">
+                use <span className="text-accent">/instagram</span> in a note to compose a post,
+                or embed one with <span className="text-accent">::instagram[post-id]</span>.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <p className="text-sm text-muted mb-3">
+                connect an instagram business/creator account via zernio to publish and schedule posts from notes.
+              </p>
+              <button
+                onClick={handleConnectInstagram}
+                disabled={igConnecting}
+                className="bg-foreground text-background px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity duration-100 disabled:opacity-50"
+              >
+                {igConnecting ? "> waiting for authorization..." : "> connect instagram"}
+              </button>
+              {igError && <p className="text-xs text-error mt-2">{igError}</p>}
             </div>
           )}
         </div>

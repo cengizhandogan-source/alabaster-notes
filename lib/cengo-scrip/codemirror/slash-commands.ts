@@ -214,6 +214,22 @@ const commands: SlashCommand[] = [
     },
   },
   {
+    pattern: "/instagram",
+    handle(view, matchStart, matchEnd) {
+      view.dispatch({ changes: { from: matchStart, to: matchEnd, insert: "" } })
+      const detail = {
+        onPosted(postId: string) {
+          const pos = view.state.selection.main.head
+          view.dispatch({
+            changes: { from: pos, insert: `::instagram[${postId}]\n` },
+            selection: { anchor: pos + `::instagram[${postId}]\n`.length },
+          })
+        },
+      }
+      window.dispatchEvent(new CustomEvent("alabaster:open-instagram-modal", { detail }))
+    },
+  },
+  {
     pattern: "/date",
     handle(view, matchStart, matchEnd) {
       const today = new Date().toLocaleDateString("en-US", {
