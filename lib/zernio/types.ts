@@ -37,9 +37,13 @@ export type ZernioAccount = {
   username: string
   displayName?: string
   profileImage?: string
+  profilePicture?: string
   createdAt?: string
   healthStatus?: "connected" | "disconnected" | "warning"
-  profileId: string
+  platformStatus?: string
+  isActive?: boolean
+  // Zernio returns profileId as an embedded object on list endpoints.
+  profileId: string | { _id: string; name?: string }
 }
 
 export type ZernioMediaItem = {

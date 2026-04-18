@@ -91,16 +91,18 @@ export function getConnectUrl(platform: ZernioPlatform, profileId: string) {
   return zernioFetch<{ authUrl: string }>(`/connect/${platform}?${params}`)
 }
 
-export async function listAccountsForProfile(profileId: string): Promise<ZernioAccount[]> {
+export async function listAllAccounts(): Promise<ZernioAccount[]> {
   const { accounts } = await zernioFetch<{ accounts: ZernioAccount[] }>("/accounts")
-  return (accounts || []).filter((a) => a.profileId === profileId)
+  return accounts || []
 }
 
-export async function listInstagramAccountsForUser(userId: string): Promise<ZernioAccount[]> {
-  const profileId = await getZernioProfileId(userId)
-  if (!profileId) return []
-  const accounts = await listAccountsForProfile(profileId)
-  return accounts.filter((a) => a.platform === "instagram")
+export async function listInstagramAccountsForUser(_userId: string): Promise<ZernioAccount[]> {
+  // Zernio's API key is single-tenant from their side — it scopes to one Zernio
+  // account, which in turn owns one or more profiles. Instagram accounts can land
+  // under either the Default profile or a profile we created, so listing the
+  // full set under the key is what matches reality.
+  const accounts = await listAllAccounts()
+  return accounts.filter((a) => a.platform === "instagram" && a.isActive !== false)
 }
 
 export function deleteZernioProfile(zernioProfileId: string) {

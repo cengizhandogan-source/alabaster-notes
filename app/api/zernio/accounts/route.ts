@@ -13,8 +13,8 @@ export async function GET() {
         id: a._id,
         username: a.username,
         displayName: a.displayName || a.username,
-        profileImage: a.profileImage || null,
-        healthStatus: a.healthStatus || "connected",
+        profileImage: a.profilePicture || a.profileImage || null,
+        healthStatus: a.healthStatus || a.platformStatus || "connected",
       })),
     })
   } catch (err) {
